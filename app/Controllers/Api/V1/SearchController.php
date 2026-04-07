@@ -61,6 +61,6 @@ class SearchController extends BaseApiController
         return $this->respondSuccess('Suggestions retrieved.', [
             'query'       => $q,
             'suggestions' => $this->productService->getSuggestions($q, $limit),
-        ]);
+       ]);
     }
 }
