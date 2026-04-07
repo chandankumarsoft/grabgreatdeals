@@ -46,6 +46,9 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], function ($r
         $routes->post('orders',                'OrderController::checkout');
         $routes->get('orders',                 'OrderController::index');
         $routes->get('orders/(:num)',           'OrderController::show/$1');
+
+        // Payment (customer view)
+        $routes->get('orders/(:num)/payment',  'PaymentController::show/$1');
     });
 
     // ── Admin routes (JWT + admin role) ──────────────────────────────────────
@@ -64,7 +67,16 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], function ($r
         $routes->get('orders',                            'Admin\OrderController::index');
         $routes->put('orders/(:num)/status',              'Admin\OrderController::updateStatus/$1');
 
+        // Payment management
+        $routes->get('orders/(:num)/payment',             'Admin\PaymentController::show/$1');
+        $routes->put('orders/(:num)/payment',             'Admin\PaymentController::update/$1');
+
         // Users management
         $routes->get('users',                             'Admin\UserController::index');
+    });
+
+    // ── Webhook routes (public, no auth — secured by gateway signature) ───────
+    $routes->group('webhooks', [], function ($routes) {
+        $routes->post('payment/(:segment)', 'WebhookController::payment/$1');
     });
 });
