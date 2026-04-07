@@ -24,6 +24,10 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], function ($r
 
         // Public product reviews
         $routes->get('products/(:num)/reviews', 'ReviewController::index/$1');
+
+        // Search
+        $routes->get('search',             'SearchController::index');
+        $routes->get('search/suggestions', 'SearchController::suggestions');
     });
 
     // ── Authenticated routes (JWT required) ───────────────────────────────────

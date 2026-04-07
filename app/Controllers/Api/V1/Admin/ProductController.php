@@ -17,9 +17,17 @@ class ProductController extends BaseApiController
     public function index()
     {
         $params = [
-            'page'     => $this->request->getGet('page'),
-            'per_page' => $this->request->getGet('per_page'),
-            'search'   => $this->request->getGet('search'),
+            'page'        => $this->request->getGet('page'),
+            'per_page'    => $this->request->getGet('per_page'),
+            'search'      => $this->request->getGet('search'),
+            'category'    => $this->request->getGet('category'),
+            'is_active'   => $this->request->getGet('is_active'),
+            'is_featured' => $this->request->getGet('is_featured'),
+            'min_price'   => $this->request->getGet('min_price'),
+            'max_price'   => $this->request->getGet('max_price'),
+            'low_stock'   => $this->request->getGet('low_stock'),
+            'sort'        => $this->request->getGet('sort'),
+            'order'       => $this->request->getGet('order'),
         ];
 
         $result = $this->productService->getAdminProducts($params);
