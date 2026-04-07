@@ -6,6 +6,7 @@ use App\Models\ProductModel;
 use App\Models\ProductVariantModel;
 use App\Models\ProductImageModel;
 use App\Models\CategoryModel;
+use App\Models\ReviewModel;
 
 class ProductService
 {
@@ -13,6 +14,7 @@ class ProductService
     protected ProductVariantModel $variantModel;
     protected ProductImageModel   $imageModel;
     protected CategoryModel       $categoryModel;
+    protected ReviewModel         $reviewModel;
 
     public function __construct()
     {
@@ -20,6 +22,7 @@ class ProductService
         $this->variantModel  = new ProductVariantModel();
         $this->imageModel    = new ProductImageModel();
         $this->categoryModel = new CategoryModel();
+        $this->reviewModel   = new ReviewModel();
     }
 
     public function getProducts(array $params = []): array
@@ -42,6 +45,7 @@ class ProductService
 
         $product['variants'] = $this->variantModel->getByProduct((int) $product['id']);
         $product['images']   = $this->imageModel->getByProduct((int) $product['id']);
+        $product             = array_merge($product, $this->reviewModel->getRatingStats((int) $product['id']));
 
         return $product;
     }
@@ -56,6 +60,7 @@ class ProductService
 
         $product['variants'] = $this->variantModel->getByProduct($id);
         $product['images']   = $this->imageModel->getByProduct($id);
+        $product             = array_merge($product, $this->reviewModel->getRatingStats($id));
 
         return $product;
     }

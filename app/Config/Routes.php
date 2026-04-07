@@ -19,8 +19,11 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], function ($r
         $routes->post('auth/login',    'AuthController::login');
 
         // Public product listing
-        $routes->get('products',          'ProductController::index');
+        $routes->get('products',            'ProductController::index');
         $routes->get('products/(:segment)', 'ProductController::show/$1');
+
+        // Public product reviews
+        $routes->get('products/(:num)/reviews', 'ReviewController::index/$1');
     });
 
     // ── Authenticated routes (JWT required) ───────────────────────────────────
@@ -51,7 +54,16 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], function ($r
         $routes->get('orders/(:num)/payment',  'PaymentController::show/$1');
 
         // Coupon validation
-        $routes->post('coupons/apply',         'CouponController::apply');
+        $routes->post('coupons/apply', 'CouponController::apply');
+
+        // Reviews (authenticated: submit, edit, delete own)
+        $routes->post('products/(:num)/reviews',              'ReviewController::create/$1');
+        $routes->put('products/(:num)/reviews/(:num)',        'ReviewController::update/$1/$2');
+        $routes->delete('products/(:num)/reviews/(:num)',     'ReviewController::delete/$1/$2');
+
+        // Wishlist
+        $routes->get('wishlist',              'WishlistController::index');
+        $routes->post('wishlist/(:num)',       'WishlistController::toggle/$1');
     });
 
     // ── Admin routes (JWT + admin role) ──────────────────────────────────────
@@ -81,11 +93,16 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], function ($r
         $routes->put('users/(:num)/role',                 'Admin\UserController::updateRole/$1');
 
         // Coupons management
-        $routes->get('coupons',                           'Admin\CouponController::index');
-        $routes->get('coupons/(:num)',                    'Admin\CouponController::show/$1');
-        $routes->post('coupons',                          'Admin\CouponController::create');
-        $routes->put('coupons/(:num)',                    'Admin\CouponController::update/$1');
-        $routes->delete('coupons/(:num)',                 'Admin\CouponController::delete/$1');
+        $routes->get('coupons',              'Admin\CouponController::index');
+        $routes->get('coupons/(:num)',        'Admin\CouponController::show/$1');
+        $routes->post('coupons',             'Admin\CouponController::create');
+        $routes->put('coupons/(:num)',        'Admin\CouponController::update/$1');
+        $routes->delete('coupons/(:num)',     'Admin\CouponController::delete/$1');
+
+        // Reviews management
+        $routes->get('reviews',                        'Admin\ReviewController::index');
+        $routes->put('reviews/(:num)/approve',         'Admin\ReviewController::approve/$1');
+        $routes->delete('reviews/(:num)',              'Admin\ReviewController::delete/$1');
     });
 
     // ── Webhook routes (public, no auth — secured by gateway signature) ───────
