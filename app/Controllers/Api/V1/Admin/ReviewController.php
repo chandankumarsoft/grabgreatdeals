@@ -21,9 +21,8 @@ class ReviewController extends BaseApiController
      */
     public function index()
     {
-        $page    = max(1, (int) ($this->request->getGet('page')     ?? 1));
-        $perPage = min(100, max(1, (int) ($this->request->getGet('per_page') ?? 15)));
-        $status  = $this->request->getGet('status') ?? '';
+        ['page' => $page, 'per_page' => $perPage] = $this->getPaginationParams();
+        $status = $this->request->getGet('status') ?? '';
 
         $result = $this->reviewService->adminList($perPage, $page, $status);
 

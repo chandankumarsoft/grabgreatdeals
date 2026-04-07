@@ -33,4 +33,12 @@ abstract class BaseApiController extends BaseController
             ? (int) $this->request->jwtPayload->sub
             : null;
     }
+
+    protected function getPaginationParams(int $default = 15, int $max = 100): array
+    {
+        return [
+            'page'     => max(1, (int) ($this->request->getGet('page')     ?? 1)),
+            'per_page' => max(1, min($max, (int) ($this->request->getGet('per_page') ?? $default))),
+        ];
+    }
 }

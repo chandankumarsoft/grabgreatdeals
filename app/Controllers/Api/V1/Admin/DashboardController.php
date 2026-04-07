@@ -32,11 +32,11 @@ class DashboardController extends BaseApiController
 
         if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $startDate) ||
             ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $endDate)) {
-            return $this->respondValidationError(['date' => 'start_date and end_date must be Y-m-d format.']);
+            return $this->respondValidationErrors(['date' => 'start_date and end_date must be Y-m-d format.']);
         }
 
         if (! in_array($groupBy, ['day', 'week', 'month'])) {
-            return $this->respondValidationError(['group_by' => 'group_by must be day, week, or month.']);
+            return $this->respondValidationErrors(['group_by' => 'group_by must be day, week, or month.']);
         }
 
         $report = $this->dashboardService->getSalesReport($startDate, $endDate, $groupBy);
@@ -53,13 +53,13 @@ class DashboardController extends BaseApiController
         $sortBy    = $this->request->getGet('sort_by')    ?? 'revenue';
 
         if ($startDate && ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $startDate)) {
-            return $this->respondValidationError(['start_date' => 'start_date must be Y-m-d format.']);
+            return $this->respondValidationErrors(['start_date' => 'start_date must be Y-m-d format.']);
         }
         if ($endDate && ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $endDate)) {
-            return $this->respondValidationError(['end_date' => 'end_date must be Y-m-d format.']);
+            return $this->respondValidationErrors(['end_date' => 'end_date must be Y-m-d format.']);
         }
         if (! in_array($sortBy, ['revenue', 'quantity'])) {
-            return $this->respondValidationError(['sort_by' => 'sort_by must be revenue or quantity.']);
+            return $this->respondValidationErrors(['sort_by' => 'sort_by must be revenue or quantity.']);
         }
 
         $data = $this->dashboardService->getTopProducts($limit, $startDate, $endDate, $sortBy);

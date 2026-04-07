@@ -19,8 +19,7 @@ class ReviewController extends BaseApiController
      */
     public function index(int $productId)
     {
-        $page    = max(1, (int) ($this->request->getGet('page')     ?? 1));
-        $perPage = min(50, max(1, (int) ($this->request->getGet('per_page') ?? 10)));
+        ['page' => $page, 'per_page' => $perPage] = $this->getPaginationParams(10, 50);
 
         $result = $this->reviewService->getForProduct($productId, $perPage, $page);
         $stats  = $this->reviewService->getRatingStats($productId);

@@ -45,12 +45,6 @@ trait ApiResponseTrait
         return $this->respondError('Validation failed', $errors, 422);
     }
 
-    /** @deprecated Use respondValidationErrors() */
-    protected function respondValidationError(array $errors)
-    {
-        return $this->respondValidationErrors($errors);
-    }
-
     protected function respondUnauthorized(string $message = 'Unauthorized')
     {
         return $this->respondError($message, [], 401);

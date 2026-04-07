@@ -53,9 +53,8 @@ class OrderController extends BaseApiController
 
     public function index()
     {
-        $userId  = (int) $this->getAuthUserId();
-        $perPage = max(1, min(50, (int) ($this->request->getGet('per_page') ?? 15)));
-        $page    = max(1, (int) ($this->request->getGet('page') ?? 1));
+        $userId = (int) $this->getAuthUserId();
+        ['page' => $page, 'per_page' => $perPage] = $this->getPaginationParams(15, 50);
 
         $result = $this->orderService->getUserOrders($userId, $perPage, $page);
 

@@ -19,8 +19,7 @@ class CouponController extends BaseApiController
      */
     public function index()
     {
-        $page    = max(1, (int) ($this->request->getGet('page')     ?? 1));
-        $perPage = min(100, max(1, (int) ($this->request->getGet('per_page') ?? 15)));
+        ['page' => $page, 'per_page' => $perPage] = $this->getPaginationParams();
 
         return $this->respondSuccess('Coupons retrieved', $this->couponService->list($perPage, $page));
     }
