@@ -19,14 +19,25 @@ use CodeIgniter\Config\BaseService;
  */
 class Services extends BaseService
 {
-    /*
-     * public static function example($getShared = true)
-     * {
-     *     if ($getShared) {
-     *         return static::getSharedInstance('example');
-     *     }
-     *
-     *     return new \CodeIgniter\Example();
-     * }
+    /**
+     * Override the default IncomingRequest with our custom subclass that
+     * formally declares the jwtPayload property set by AuthFilter.
      */
+    public static function request(
+        ?\Config\App $config = null,
+        bool $getShared = true
+    ): \App\HTTP\IncomingRequest {
+        if ($getShared) {
+            return static::getSharedInstance('request', $config);
+        }
+
+        $config ??= config('App');
+
+        return new \App\HTTP\IncomingRequest(
+            $config,
+            static::uri(),
+            'php://input',
+            new \CodeIgniter\HTTP\UserAgent()
+        );
+    }
 }

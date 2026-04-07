@@ -9,6 +9,11 @@ abstract class BaseApiController extends BaseController
 {
     use ApiResponseTrait;
 
+    /**
+     * @var \App\HTTP\IncomingRequest $request
+     */
+    protected $request;
+
     protected function getValidatedInput(array $rules, array $messages = []): array|false
     {
         if (! $this->validate($rules, $messages)) {
@@ -20,14 +25,12 @@ abstract class BaseApiController extends BaseController
 
     protected function getAuthUserId(): ?int
     {
-        $token = $this->request->getHeaderLine('Authorization');
-
-        if (empty($token)) {
+        if (empty($this->request->getHeaderLine('Authorization'))) {
             return null;
         }
 
-        // jwtPayload is set dynamically by AuthFilter after JWT verification
-        // @phpstan-ignore-next-line
-        return isset($this->request->jwtPayload) ? (int) $this->request->jwtPayload->sub : null;
+        return isset($this->request->jwtPayload->sub)
+            ? (int) $this->request->jwtPayload->sub
+            : null;
     }
 }
