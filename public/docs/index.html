@@ -1,0 +1,1978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrabGreatDeals API Documentation</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sidebar-width: 260px;
+      --header-height: 56px;
+      --brand:   #e44d26;
+      --brand-dark: #c0392b;
+      --text:    #333;
+      --muted:   #666;
+      --border:  #dde1e7;
+      --bg:      #f5f7fa;
+      --code-bg: #f6f8fa;
+      --sidebar-bg: #2b2d2e;
+      --sidebar-text: #ccc;
+      --sidebar-hover: #e44d26;
+      --sidebar-active-bg: #3a3c3e;
+      --admin-badge: #9b59b6;
+      --lock-badge:  #3498db;
+    }
+
+    /* ── SCROLLBAR ────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #bbb; border-radius: 3px; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── TOP BAR ──────────────────────────────── */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--header-height);
+      background: var(--brand);
+      display: flex; align-items: center; padding: 0 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.2);
+    }
+    header .logo { font-size: 1.15rem; font-weight: 700; color: #fff; letter-spacing: .5px; }
+    header .logo span { opacity: .75; font-weight: 400; }
+    header .version-tag {
+      margin-left: 12px; background: rgba(255,255,255,.2);
+      color: #fff; font-size: .7rem; padding: 2px 7px; border-radius: 10px;
+    }
+    #hamburger {
+      display: none; background: none; border: none; cursor: pointer;
+      margin-right: 14px; color: #fff; font-size: 1.4rem; line-height: 1;
+    }
+
+    /* ── LAYOUT ───────────────────────────────── */
+    .layout {
+      display: flex;
+      margin-top: var(--header-height);
+      height: calc(100vh - var(--header-height));
+    }
+
+    /* ── SIDEBAR ──────────────────────────────── */
+    nav#sidebar {
+      width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      overflow-y: auto;
+      flex-shrink: 0;
+      padding: 16px 0 40px;
+    }
+    .sidebar-group { padding: 14px 16px 4px; font-size: .68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px; color: #777; }
+    nav#sidebar a {
+      display: block; padding: 7px 20px; color: var(--sidebar-text);
+      text-decoration: none; font-size: .82rem; line-height: 1.4;
+      border-left: 3px solid transparent; transition: all .15s;
+    }
+    nav#sidebar a:hover { color: #fff; background: rgba(255,255,255,.05); }
+    nav#sidebar a.active {
+      color: #fff; background: var(--sidebar-active-bg);
+      border-left-color: var(--brand);
+    }
+    nav#sidebar a .badge {
+      display: inline-block; font-size: .6rem; padding: 1px 5px;
+      border-radius: 3px; margin-left: 5px; vertical-align: middle;
+    }
+    .badge-lock  { background: var(--lock-badge); color: #fff; }
+    .badge-admin { background: var(--admin-badge); color: #fff; }
+    .badge-pub   { background: #27ae60; color: #fff; }
+
+    /* ── MAIN CONTENT ─────────────────────────── */
+    main {
+      flex: 1; padding: 40px 48px; overflow-y: auto;
+      background: #fff;
+    }
+    main > section { max-width: 860px; }
+
+    /* ── SECTION HEADERS ──────────────────────── */
+    .section-block { margin-bottom: 60px; }
+    .section-block h2 {
+      font-size: 1.55rem; font-weight: 700; color: var(--brand-dark);
+      border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 24px;
+    }
+
+    /* ── ENDPOINT BLOCK ───────────────────────── */
+    .endpoint {
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 6px; margin-bottom: 28px; overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,.05);
+    }
+    .endpoint-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 18px; background: var(--code-bg); border-bottom: 1px solid var(--border);
+      cursor: pointer; user-select: none;
+    }
+    .endpoint-header:hover { background: #eef0f3; }
+    .method {
+      font-size: .78rem; font-weight: 700; padding: 3px 9px; border-radius: 4px;
+      min-width: 56px; text-align: center; text-transform: uppercase; letter-spacing: .5px;
+    }
+    .method.GET    { background: #27ae60; color: #fff; }
+    .method.POST   { background: #2980b9; color: #fff; }
+    .method.PUT    { background: #e67e22; color: #fff; }
+    .method.DELETE { background: #c0392b; color: #fff; }
+    .method.PATCH  { background: #8e44ad; color: #fff; }
+    .endpoint-path { font-family: "SFMono-Regular", Consolas, monospace; font-size: .9rem; color: #333; font-weight: 600; }
+    .endpoint-auth { margin-left: auto; display: flex; gap: 6px; }
+    .endpoint-auth .chip {
+      font-size: .65rem; padding: 2px 6px; border-radius: 3px; font-weight: 600;
+    }
+    .chip-jwt   { background: #d6eaf8; color: #1a5276; border: 1px solid #aed6f1; }
+    .chip-admin { background: #e8daef; color: #512e5f; border: 1px solid #c39bd3; }
+    .chip-pub   { background: #d5f5e3; color: #1e8449; border: 1px solid #82e0aa; }
+    .endpoint-arrow { margin-left: 6px; transition: transform .2s; font-size: .8rem; color: #888; }
+    .endpoint.collapsed .endpoint-arrow { transform: rotate(-90deg); }
+
+    .endpoint-body { padding: 20px 22px; display: block; }
+    .endpoint.collapsed .endpoint-body { display: none; }
+
+    .endpoint-desc { color: var(--muted); margin-bottom: 14px; font-size: .9rem; line-height: 1.6; }
+
+    /* ── TABLES ───────────────────────────────── */
+    .param-label { font-size: .78rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .8px; color: #888; margin: 18px 0 8px; }
+    .param-table { width: 100%; border-collapse: collapse; font-size: .82rem; margin-bottom: 18px; }
+    .param-table th {
+      background: var(--code-bg); border: 1px solid var(--border);
+      padding: 7px 12px; text-align: left; font-weight: 600; color: #555;
+    }
+    .param-table td { border: 1px solid var(--border); padding: 7px 12px; vertical-align: top; }
+    .param-table tr:nth-child(even) td { background: #fafbfc; }
+    .param-table code { background: #eef0f3; padding: 1px 5px; border-radius: 3px; font-size: .8rem; }
+    .req-yes { color: #e74c3c; font-weight: 600; }
+    .req-no  { color: #aaa; }
+
+    /* ── CODE ─────────────────────────────────── */
+    pre {
+      background: var(--code-bg); border: 1px solid var(--border);
+      border-radius: 5px; padding: 14px 16px; overflow-x: auto;
+      margin: 10px 0 16px; font-size: .8rem; line-height: 1.55;
+    }
+    pre code.hljs { background: transparent; padding: 0; font-size: inherit; }
+    .code-label {
+      font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .8px;
+      color: #888; margin-top: 14px; margin-bottom: 4px;
+    }
+
+    /* ── OVERVIEW CARDS ───────────────────────── */
+    .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 14px; margin: 20px 0 30px; }
+    .ov-card { background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; }
+    .ov-card .ov-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .8px; color: #888; margin-bottom: 4px; }
+    .ov-card .ov-val  { font-size: .9rem; font-weight: 600; font-family: monospace; color: #333; }
+
+    /* ── STATUS TABLE ─────────────────────────── */
+    .status-table { width: 100%; border-collapse: collapse; font-size: .83rem; margin-bottom: 20px; }
+    .status-table th { background: var(--code-bg); border: 1px solid var(--border); padding: 7px 14px; text-align: left; font-weight: 600; color: #555; }
+    .status-table td { border: 1px solid var(--border); padding: 7px 14px; }
+    .status-table tr:nth-child(even) td { background: #fafbfc; }
+    .sc { display: inline-block; font-weight: 700; font-family: monospace; padding: 1px 6px; border-radius: 3px; font-size: .78rem; }
+    .sc-2xx { background: #d5f5e3; color: #1e8449; }
+    .sc-4xx { background: #fde8e8; color: #c0392b; }
+    .sc-5xx { background: #fef9e7; color: #9a7d0a; }
+
+    /* ── AUTH SECTION BANNER ──────────────────── */
+    .auth-note {
+      background: #fff8e1; border-left: 4px solid #f9a825;
+      padding: 10px 16px; border-radius: 0 4px 4px 0;
+      font-size: .85rem; color: #5d4037; margin-bottom: 20px;
+    }
+    .auth-note strong { color: #e65100; }
+
+    /* ── CRED TABLE ───────────────────────────── */
+    .cred-badge { background: #2c3e50; color: #e8e8e8; font-family: monospace; font-size: .82rem; padding: 2px 6px; border-radius: 3px; }
+
+    /* ── RESPONSE ENVELOPE ───────────────────── */
+    .envelope-table { width: 100%; border-collapse: collapse; font-size: .83rem; margin-bottom: 20px; }
+    .envelope-table th { background: var(--code-bg); border: 1px solid var(--border); padding: 7px 14px; text-align: left; font-weight: 600; }
+    .envelope-table td { border: 1px solid var(--border); padding: 7px 14px; }
+
+    /* ── ALERTS ───────────────────────────────── */
+    .alert {
+      padding: 10px 16px; border-radius: 4px; font-size: .84rem; margin-bottom: 16px; line-height: 1.55;
+    }
+    .alert-warning { background: #fff3cd; border-left: 4px solid #ffc107; color: #856404; }
+    .alert-info    { background: #d1ecf1; border-left: 4px solid #17a2b8; color: #0c5460; }
+
+    /* ── LEGEND ───────────────────────────────── */
+    .legend { display: flex; gap: 20px; flex-wrap: wrap; font-size: .82rem; color: var(--muted); margin-top: 10px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+
+    /* ── BACK TO TOP ──────────────────────────── */
+    #back-top {
+      position: fixed; bottom: 28px; right: 28px;
+      background: var(--brand); color: #fff; border: none; border-radius: 50%;
+      width: 40px; height: 40px; font-size: 1.1rem; cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,.2); opacity: 0; transition: opacity .3s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #back-top.visible { opacity: 1; }
+
+    /* ── SEARCH ───────────────────────────────── */
+    .search-wrap { padding: 10px 12px; }
+    #sidebar-search {
+      width: 100%; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.1);
+      color: #eee; padding: 7px 10px; border-radius: 4px; font-size: .8rem;
+      outline: none; transition: border .2s;
+    }
+    #sidebar-search::placeholder { color: #888; }
+    #sidebar-search:focus { border-color: var(--brand); }
+
+    /* ── RESPONSIVE ───────────────────────────── */
+    @media (max-width: 780px) {
+      #hamburger { display: block; }
+      nav#sidebar {
+        position: fixed; top: var(--header-height); left: 0; bottom: 0;
+        z-index: 90; transform: translateX(-100%); transition: transform .25s;
+      }
+      nav#sidebar.open { transform: translateX(0); }
+      main { padding: 24px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header>
+  <button id="hamburger" aria-label="Toggle menu">&#9776;</button>
+  <div class="logo">GrabGreatDeals <span>/ API</span></div>
+  <span class="version-tag">v1</span>
+</header>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="search-wrap">
+      <input id="sidebar-search" type="text" placeholder="Filter sections…" autocomplete="off" />
+    </div>
+
+    <div class="sidebar-group">Getting Started</div>
+    <a href="#overview" class="nav-link">Overview</a>
+    <a href="#authentication" class="nav-link">Authentication</a>
+    <a href="#errors" class="nav-link">Error Reference</a>
+
+    <div class="sidebar-group">Public Endpoints</div>
+    <a href="#auth" class="nav-link">1 &nbsp;Auth</a>
+    <a href="#products" class="nav-link">2 &nbsp;Products <span class="badge badge-pub">public</span></a>
+    <a href="#search" class="nav-link">3 &nbsp;Search <span class="badge badge-pub">public</span></a>
+
+    <div class="sidebar-group">Customer Endpoints</div>
+    <a href="#profile" class="nav-link">4 &nbsp;User Profile <span class="badge badge-lock">JWT</span></a>
+    <a href="#cart" class="nav-link">5 &nbsp;Cart <span class="badge badge-lock">JWT</span></a>
+    <a href="#orders" class="nav-link">6 &nbsp;Orders <span class="badge badge-lock">JWT</span></a>
+    <a href="#payments" class="nav-link">7 &nbsp;Payments <span class="badge badge-lock">JWT</span></a>
+    <a href="#coupons" class="nav-link">8 &nbsp;Coupons <span class="badge badge-lock">JWT</span></a>
+    <a href="#reviews" class="nav-link">9 &nbsp;Reviews <span class="badge badge-lock">JWT</span></a>
+    <a href="#wishlist" class="nav-link">10&nbsp;Wishlist <span class="badge badge-lock">JWT</span></a>
+
+    <div class="sidebar-group">Admin Endpoints</div>
+    <a href="#admin-products" class="nav-link">11&nbsp;Products <span class="badge badge-admin">admin</span></a>
+    <a href="#admin-orders" class="nav-link">12&nbsp;Orders <span class="badge badge-admin">admin</span></a>
+    <a href="#admin-payments" class="nav-link">13&nbsp;Payments <span class="badge badge-admin">admin</span></a>
+    <a href="#admin-users" class="nav-link">14&nbsp;Users <span class="badge badge-admin">admin</span></a>
+    <a href="#admin-coupons" class="nav-link">15&nbsp;Coupons <span class="badge badge-admin">admin</span></a>
+    <a href="#admin-reviews" class="nav-link">16&nbsp;Reviews <span class="badge badge-admin">admin</span></a>
+    <a href="#admin-dashboard" class="nav-link">17&nbsp;Dashboard <span class="badge badge-admin">admin</span></a>
+    <a href="#webhooks" class="nav-link">18&nbsp;Webhooks</a>
+  </nav>
+
+  <!-- MAIN -->
+  <main id="main-content">
+    <section>
+
+      <!-- ═══════════════════ OVERVIEW ═══════════════════ -->
+      <div class="section-block" id="overview">
+        <h2>Overview</h2>
+        <div class="overview-grid">
+          <div class="ov-card"><div class="ov-label">Base URL</div><div class="ov-val">http://localhost:8080/api/v1</div></div>
+          <div class="ov-card"><div class="ov-label">Format</div><div class="ov-val">JSON</div></div>
+          <div class="ov-card"><div class="ov-label">Authentication</div><div class="ov-val">JWT Bearer</div></div>
+          <div class="ov-card"><div class="ov-label">API Version</div><div class="ov-val">v1</div></div>
+        </div>
+
+        <h3 style="margin-bottom:10px;font-size:1rem;">Response Envelope</h3>
+        <p style="color:var(--muted);font-size:.88rem;margin-bottom:10px;">Every response — success or error — uses the same wrapper:</p>
+        <pre><code class="language-json">{
+  "status": true,
+  "message": "Human-readable message",
+  "data": { },
+  "errors": []
+}</code></pre>
+
+        <table class="envelope-table">
+          <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>status</code></td><td>boolean</td><td><code>true</code> on success, <code>false</code> on error</td></tr>
+            <tr><td><code>message</code></td><td>string</td><td>Human-readable summary</td></tr>
+            <tr><td><code>data</code></td><td>object | array | null</td><td>Response payload</td></tr>
+            <tr><td><code>errors</code></td><td>array</td><td>Validation or error detail</td></tr>
+          </tbody>
+        </table>
+
+        <h3 style="margin:20px 0 10px;font-size:1rem;">HTTP Status Codes</h3>
+        <table class="status-table">
+          <thead><tr><th>Code</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><span class="sc sc-2xx">200</span></td><td>OK</td></tr>
+            <tr><td><span class="sc sc-2xx">201</span></td><td>Created</td></tr>
+            <tr><td><span class="sc sc-4xx">400</span></td><td>Bad Request</td></tr>
+            <tr><td><span class="sc sc-4xx">401</span></td><td>Unauthorized — missing or invalid token</td></tr>
+            <tr><td><span class="sc sc-4xx">403</span></td><td>Forbidden — valid token, insufficient role</td></tr>
+            <tr><td><span class="sc sc-4xx">404</span></td><td>Not Found</td></tr>
+            <tr><td><span class="sc sc-4xx">422</span></td><td>Unprocessable Entity — validation failed</td></tr>
+            <tr><td><span class="sc sc-5xx">500</span></td><td>Internal Server Error</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ═══════════════════ AUTHENTICATION ═══════════════════ -->
+      <div class="section-block" id="authentication">
+        <h2>Authentication</h2>
+        <p style="margin-bottom:14px;font-size:.9rem;color:var(--muted);">
+          Pass the JWT token in the <code>Authorization</code> header:
+        </p>
+        <pre><code class="language-http">Authorization: Bearer &lt;token&gt;</code></pre>
+        <p style="margin:14px 0 10px;font-size:.88rem;color:var(--muted);">
+          Tokens are returned by the <strong>Login</strong> and <strong>Register</strong> endpoints.
+          The token contains <code>sub</code> (user ID), <code>email</code>, <code>role</code>, and expires according to server config.
+        </p>
+
+        <h3 style="margin:20px 0 10px;font-size:1rem;">Test Credentials</h3>
+        <table class="status-table">
+          <thead><tr><th>Role</th><th>Email</th><th>Password</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Admin</strong></td><td><span class="cred-badge">admin@grabgreatdeals.com</span></td><td><span class="cred-badge">Admin@1234</span></td></tr>
+            <tr><td><strong>Customer</strong></td><td><span class="cred-badge">customer@grabgreatdeals.com</span></td><td><span class="cred-badge">Customer@1234</span></td></tr>
+          </tbody>
+        </table>
+
+        <div class="legend">
+          <div class="legend-item"><span class="chip chip-jwt">JWT</span> Requires <code>Authorization: Bearer &lt;token&gt;</code></div>
+          <div class="legend-item"><span class="chip chip-admin">Admin</span> Requires <code>admin</code> role</div>
+          <div class="legend-item"><span class="chip chip-pub">public</span> No authentication needed</div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  1 · AUTH  ═══════════════════ -->
+      <div class="section-block" id="auth">
+        <h2>1. Auth</h2>
+
+        <!-- Register -->
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method POST">POST</span>
+            <span class="endpoint-path">/auth/register</span>
+            <div class="endpoint-auth"><span class="chip chip-pub">public</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Register a new customer account.</p>
+
+            <div class="param-label">Request Body</div>
+            <table class="param-table">
+              <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Rules</th></tr></thead>
+              <tbody>
+                <tr><td><code>name</code></td><td>string</td><td class="req-yes">Yes</td><td>2–100 chars</td></tr>
+                <tr><td><code>email</code></td><td>string</td><td class="req-yes">Yes</td><td>Valid email, unique</td></tr>
+                <tr><td><code>password</code></td><td>string</td><td class="req-yes">Yes</td><td>8–72 chars</td></tr>
+                <tr><td><code>phone</code></td><td>string</td><td class="req-no">No</td><td>Max 20 chars</td></tr>
+              </tbody>
+            </table>
+
+            <div class="code-label">Example Request</div>
+            <pre><code class="language-json">{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "Password@1234",
+  "phone": "0123456789"
+}</code></pre>
+
+            <div class="code-label">Response 201</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Registration successful",
+  "data": {
+    "user": {
+      "id": 4,
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "0123456789",
+      "role": "customer",
+      "is_active": 1,
+      "created_at": "2026-04-07 12:00:00"
+    },
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+  },
+  "errors": []
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- Login -->
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method POST">POST</span>
+            <span class="endpoint-path">/auth/login</span>
+            <div class="endpoint-auth"><span class="chip chip-pub">public</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Authenticate and receive a JWT token.</p>
+
+            <div class="param-label">Request Body</div>
+            <table class="param-table">
+              <thead><tr><th>Field</th><th>Type</th><th>Required</th></tr></thead>
+              <tbody>
+                <tr><td><code>email</code></td><td>string</td><td class="req-yes">Yes</td></tr>
+                <tr><td><code>password</code></td><td>string</td><td class="req-yes">Yes</td></tr>
+              </tbody>
+            </table>
+
+            <div class="code-label">Example Request</div>
+            <pre><code class="language-json">{
+  "email": "customer@grabgreatdeals.com",
+  "password": "Customer@1234"
+}</code></pre>
+
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Login successful",
+  "data": {
+    "user": {
+      "id": 2,
+      "name": "Customer User",
+      "email": "customer@grabgreatdeals.com",
+      "role": "customer",
+      "is_active": 1
+    },
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+  },
+  "errors": []
+}</code></pre>
+
+            <div class="param-label">Error Responses</div>
+            <table class="param-table">
+              <thead><tr><th>Status</th><th>Condition</th></tr></thead>
+              <tbody>
+                <tr><td><span class="sc sc-4xx">401</span></td><td>Wrong email/password</td></tr>
+                <tr><td><span class="sc sc-4xx">403</span></td><td>Account is deactivated</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Logout -->
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method POST">POST</span>
+            <span class="endpoint-path">/auth/logout</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Invalidates the token client-side (JWT is stateless).</p>
+
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Logged out successfully",
+  "data": null,
+  "errors": []
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  2 · PRODUCTS  ═══════════════════ -->
+      <div class="section-block" id="products">
+        <h2>2. Products <span style="font-weight:400;font-size:.9rem;color:#888;">(Public)</span></h2>
+
+        <!-- GET /products -->
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/products</span>
+            <div class="endpoint-auth"><span class="chip chip-pub">public</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">List products with filtering, sorting and pagination.</p>
+
+            <div class="param-label">Query Parameters</div>
+            <table class="param-table">
+              <thead><tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>page</code></td><td>int</td><td>1</td><td>Page number</td></tr>
+                <tr><td><code>per_page</code></td><td>int</td><td>15</td><td>Items per page (max 100)</td></tr>
+                <tr><td><code>category</code></td><td>string</td><td>—</td><td>Filter by category slug</td></tr>
+                <tr><td><code>search</code></td><td>string</td><td>—</td><td>Full-text search on name/description</td></tr>
+                <tr><td><code>featured</code></td><td>int</td><td>—</td><td><code>1</code> = featured only</td></tr>
+                <tr><td><code>min_price</code></td><td>decimal</td><td>—</td><td>Minimum price filter</td></tr>
+                <tr><td><code>max_price</code></td><td>decimal</td><td>—</td><td>Maximum price filter</td></tr>
+                <tr><td><code>min_rating</code></td><td>decimal</td><td>—</td><td>Minimum average rating (0–5)</td></tr>
+                <tr><td><code>in_stock</code></td><td>int</td><td>—</td><td><code>1</code> = in-stock only</td></tr>
+                <tr><td><code>on_sale</code></td><td>int</td><td>—</td><td><code>1</code> = items with sale price</td></tr>
+                <tr><td><code>sort</code></td><td>string</td><td>created_at</td><td><code>price</code> | <code>name</code> | <code>rating</code> | <code>popularity</code> | <code>created_at</code></td></tr>
+                <tr><td><code>order</code></td><td>string</td><td>DESC</td><td><code>ASC</code> | <code>DESC</code></td></tr>
+              </tbody>
+            </table>
+
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Products retrieved",
+  "data": {
+    "items": [
+      {
+        "id": 1,
+        "category_id": 1,
+        "name": "Wireless Bluetooth Earbuds",
+        "slug": "wireless-bluetooth-earbuds",
+        "price": "129.90",
+        "sale_price": "99.90",
+        "stock": 144,
+        "sku": "ELEC-001",
+        "thumbnail": null,
+        "is_active": 1,
+        "is_featured": 1,
+        "category_name": "Electronics",
+        "created_at": "2026-04-07 09:20:52"
+      }
+    ],
+    "total": 3,
+    "page": 1,
+    "per_page": 15,
+    "pages": 1
+  },
+  "errors": []
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- GET /products/{slug} -->
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/products/{slug}</span>
+            <div class="endpoint-auth"><span class="chip chip-pub">public</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Get full details for a single product by its slug, including variants and images.</p>
+
+            <div class="param-label">URL Parameters</div>
+            <table class="param-table">
+              <thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>slug</code></td><td>string</td><td>Product slug e.g. <code>wireless-bluetooth-earbuds</code></td></tr>
+              </tbody>
+            </table>
+
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Product retrieved",
+  "data": {
+    "id": 1,
+    "name": "Wireless Bluetooth Earbuds",
+    "slug": "wireless-bluetooth-earbuds",
+    "price": "129.90",
+    "sale_price": "99.90",
+    "stock": 144,
+    "sku": "ELEC-001",
+    "avg_rating": 4.5,
+    "review_count": 12,
+    "variants": [
+      { "id": 1, "name": "Color", "value": "Black", "price_adjustment": "0.00", "stock": 80, "sku": "ELEC-001-BLK" }
+    ],
+    "images": [
+      { "id": 1, "image_path": "uploads/products/earbuds.jpg", "alt_text": "...", "sort_order": 0, "is_primary": 1 }
+    ]
+  },
+  "errors": []
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- GET /products/{id}/reviews -->
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/products/{id}/reviews</span>
+            <div class="endpoint-auth"><span class="chip chip-pub">public</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Get paginated approved reviews for a product.</p>
+
+            <div class="param-label">URL Parameters</div>
+            <table class="param-table">
+              <thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody><tr><td><code>id</code></td><td>int</td><td>Product ID</td></tr></tbody>
+            </table>
+
+            <div class="param-label">Query Parameters</div>
+            <table class="param-table">
+              <thead><tr><th>Param</th><th>Type</th><th>Default</th></tr></thead>
+              <tbody>
+                <tr><td><code>page</code></td><td>int</td><td>1</td></tr>
+                <tr><td><code>per_page</code></td><td>int</td><td>10 (max 50)</td></tr>
+              </tbody>
+            </table>
+
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Reviews retrieved",
+  "data": {
+    "avg_rating": 4.5,
+    "review_count": 12,
+    "items": [
+      {
+        "id": 1,
+        "rating": 5,
+        "title": "Great product!",
+        "body": "Really happy with this purchase.",
+        "reviewer_name": "Customer User",
+        "created_at": "2026-04-07 14:00:00"
+      }
+    ],
+    "total": 12,
+    "page": 1,
+    "per_page": 10,
+    "pages": 2
+  },
+  "errors": []
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  3 · SEARCH  ═══════════════════ -->
+      <div class="section-block" id="search">
+        <h2>3. Search <span style="font-weight:400;font-size:.9rem;color:#888;">(Public)</span></h2>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/search</span>
+            <div class="endpoint-auth"><span class="chip chip-pub">public</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Search products and categories.</p>
+
+            <div class="param-label">Query Parameters</div>
+            <table class="param-table">
+              <thead><tr><th>Param</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>q</code></td><td>string</td><td class="req-yes">Yes</td><td>Search query (min 2 chars)</td></tr>
+                <tr><td><code>category</code></td><td>string</td><td class="req-no">No</td><td>Filter by category slug</td></tr>
+                <tr><td><code>min_price</code></td><td>decimal</td><td class="req-no">No</td><td>Minimum price</td></tr>
+                <tr><td><code>max_price</code></td><td>decimal</td><td class="req-no">No</td><td>Maximum price</td></tr>
+                <tr><td><code>limit</code></td><td>int</td><td class="req-no">No</td><td>Max results (default 20, max 50)</td></tr>
+              </tbody>
+            </table>
+
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Search results retrieved.",
+  "data": {
+    "query": "earbuds",
+    "total_products": 1,
+    "products": [{ "id": 1, "name": "Wireless Bluetooth Earbuds", "slug": "...", "price": "129.90" }],
+    "categories": []
+  },
+  "errors": []
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/search/suggestions</span>
+            <div class="endpoint-auth"><span class="chip chip-pub">public</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Lightweight autocomplete suggestions.</p>
+
+            <div class="param-label">Query Parameters</div>
+            <table class="param-table">
+              <thead><tr><th>Param</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>q</code></td><td>string</td><td class="req-yes">Yes</td><td>Query string (min 1 char)</td></tr>
+                <tr><td><code>limit</code></td><td>int</td><td class="req-no">No</td><td>Max results (default 8, max 10)</td></tr>
+              </tbody>
+            </table>
+
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Suggestions retrieved.",
+  "data": {
+    "query": "ear",
+    "suggestions": [
+      { "id": 1, "name": "Wireless Bluetooth Earbuds", "slug": "wireless-bluetooth-earbuds", "price": "129.90" }
+    ]
+  },
+  "errors": []
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  4 · USER PROFILE  ═══════════════════ -->
+      <div class="section-block" id="profile">
+        <h2>4. User Profile</h2>
+        <div class="auth-note">All routes in this section require <strong>JWT authentication</strong>.</div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/user/profile</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Returns the authenticated user's profile.</p>
+
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Profile retrieved",
+  "data": {
+    "id": 2,
+    "name": "Customer User",
+    "email": "customer@grabgreatdeals.com",
+    "phone": "0123456789",
+    "role": "customer",
+    "is_active": 1,
+    "created_at": "2026-04-07 09:00:00"
+  },
+  "errors": []
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method PUT">PUT</span>
+            <span class="endpoint-path">/user/profile</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Update name and/or phone number. All fields optional.</p>
+
+            <div class="param-label">Request Body</div>
+            <table class="param-table">
+              <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Rules</th></tr></thead>
+              <tbody>
+                <tr><td><code>name</code></td><td>string</td><td class="req-no">No</td><td>2–100 chars</td></tr>
+                <tr><td><code>phone</code></td><td>string</td><td class="req-no">No</td><td>Max 20 chars</td></tr>
+              </tbody>
+            </table>
+
+            <div class="code-label">Example Request</div>
+            <pre><code class="language-json">{
+  "name": "New Name",
+  "phone": "0199999999"
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/user/addresses</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Returns all saved delivery addresses for the authenticated user.</p>
+
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Addresses retrieved",
+  "data": [
+    {
+      "id": 1,
+      "label": "Home",
+      "recipient_name": "John Doe",
+      "phone": "0123456789",
+      "address_line1": "123 Main Street",
+      "address_line2": null,
+      "city": "Kuala Lumpur",
+      "state": "Selangor",
+      "postal_code": "50000",
+      "country": "Malaysia",
+      "is_default": 1
+    }
+  ],
+  "errors": []
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method POST">POST</span>
+            <span class="endpoint-path">/user/addresses</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Add a new delivery address.</p>
+
+            <div class="param-label">Request Body</div>
+            <table class="param-table">
+              <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Rules</th></tr></thead>
+              <tbody>
+                <tr><td><code>recipient_name</code></td><td>string</td><td class="req-yes">Yes</td><td>Max 100 chars</td></tr>
+                <tr><td><code>phone</code></td><td>string</td><td class="req-yes">Yes</td><td>Max 20 chars</td></tr>
+                <tr><td><code>address_line1</code></td><td>string</td><td class="req-yes">Yes</td><td>Max 255 chars</td></tr>
+                <tr><td><code>address_line2</code></td><td>string</td><td class="req-no">No</td><td>Max 255 chars</td></tr>
+                <tr><td><code>city</code></td><td>string</td><td class="req-yes">Yes</td><td>Max 100 chars</td></tr>
+                <tr><td><code>state</code></td><td>string</td><td class="req-yes">Yes</td><td>Max 100 chars</td></tr>
+                <tr><td><code>postal_code</code></td><td>string</td><td class="req-yes">Yes</td><td>Max 20 chars</td></tr>
+                <tr><td><code>country</code></td><td>string</td><td class="req-no">No</td><td>Max 100 chars</td></tr>
+                <tr><td><code>label</code></td><td>string</td><td class="req-no">No</td><td>Max 50 chars e.g. "Home"</td></tr>
+                <tr><td><code>is_default</code></td><td>int</td><td class="req-no">No</td><td><code>0</code> or <code>1</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method DELETE">DELETE</span>
+            <span class="endpoint-path">/user/addresses/{id}</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Delete an address that belongs to the authenticated user.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  5 · CART  ═══════════════════ -->
+      <div class="section-block" id="cart">
+        <h2>5. Cart</h2>
+        <div class="auth-note">All routes in this section require <strong>JWT authentication</strong>.</div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/cart</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Cart retrieved",
+  "data": {
+    "cart_id": 1,
+    "items": [
+      {
+        "id": 1,
+        "product_id": 1,
+        "variant_id": null,
+        "quantity": 2,
+        "unit_price": "99.90",
+        "product_name": "Wireless Bluetooth Earbuds",
+        "thumbnail": null,
+        "product_stock": 144,
+        "variant_stock": null
+      }
+    ],
+    "item_count": 1,
+    "total": 199.80
+  },
+  "errors": []
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method POST">POST</span>
+            <span class="endpoint-path">/cart</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Add an item to the cart. If the item already exists, its quantity is incremented.</p>
+
+            <div class="param-label">Request Body</div>
+            <table class="param-table">
+              <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>product_id</code></td><td>int</td><td class="req-yes">Yes</td><td>Product ID</td></tr>
+                <tr><td><code>quantity</code></td><td>int</td><td class="req-no">No</td><td>Default <code>1</code></td></tr>
+                <tr><td><code>variant_id</code></td><td>int</td><td class="req-no">No</td><td>Variant ID if applicable</td></tr>
+              </tbody>
+            </table>
+
+            <div class="param-label">Error Codes</div>
+            <table class="param-table">
+              <thead><tr><th>Code</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr><td><code>product_not_found</code></td><td>Product doesn't exist or is inactive</td></tr>
+                <tr><td><code>variant_not_found</code></td><td>Variant doesn't belong to the product</td></tr>
+                <tr><td><code>insufficient_stock</code></td><td>Requested quantity exceeds available stock</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method PUT">PUT</span>
+            <span class="endpoint-path">/cart/{item_id}</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Update item quantity. Pass the cart item ID (not the product ID).</p>
+            <div class="code-label">Request Body</div>
+            <pre><code class="language-json">{ "quantity": 3 }</code></pre>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method DELETE">DELETE</span>
+            <span class="endpoint-path">/cart/{item_id}</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Remove a single item from the cart.</p>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method DELETE">DELETE</span>
+            <span class="endpoint-path">/cart</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Clear all items from the cart.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  6 · ORDERS  ═══════════════════ -->
+      <div class="section-block" id="orders">
+        <h2>6. Orders</h2>
+        <div class="auth-note">All routes in this section require <strong>JWT authentication</strong>.</div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method POST">POST</span>
+            <span class="endpoint-path">/orders</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Place an order from the current cart contents.</p>
+
+            <div class="param-label">Request Body</div>
+            <table class="param-table">
+              <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Rules</th></tr></thead>
+              <tbody>
+                <tr><td><code>shipping_name</code></td><td>string</td><td class="req-yes">Yes</td><td>Max 100 chars</td></tr>
+                <tr><td><code>shipping_phone</code></td><td>string</td><td class="req-yes">Yes</td><td>Max 20 chars</td></tr>
+                <tr><td><code>shipping_address</code></td><td>string</td><td class="req-yes">Yes</td><td>Max 500 chars</td></tr>
+                <tr><td><code>payment_method</code></td><td>string</td><td class="req-no">No</td><td><code>cod</code> | <code>card</code> | <code>fpx</code> | <code>ewallet</code> | <code>bank_transfer</code> (default <code>cod</code>)</td></tr>
+                <tr><td><code>shipping_fee</code></td><td>decimal</td><td class="req-no">No</td><td>Defaults to 0</td></tr>
+                <tr><td><code>coupon_code</code></td><td>string</td><td class="req-no">No</td><td>Max 50 chars</td></tr>
+                <tr><td><code>notes</code></td><td>string</td><td class="req-no">No</td><td>Max 500 chars</td></tr>
+              </tbody>
+            </table>
+
+            <div class="code-label">Example Request</div>
+            <pre><code class="language-json">{
+  "shipping_name": "John Doe",
+  "shipping_phone": "0123456789",
+  "shipping_address": "123 Main Street, Kuala Lumpur 50000",
+  "payment_method": "cod",
+  "shipping_fee": 10.00,
+  "coupon_code": "SAVE10",
+  "notes": "Please leave at door"
+}</code></pre>
+
+            <div class="code-label">Response 201</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Order placed successfully",
+  "data": {
+    "id": 7,
+    "order_number": "GGD-AB12CD34-20260407",
+    "status": "pending",
+    "subtotal": "199.80",
+    "shipping_fee": "10.00",
+    "discount_amount": "19.98",
+    "total": "189.82",
+    "items": [{ "product_name": "Wireless Bluetooth Earbuds", "quantity": 2, "unit_price": "99.90", "subtotal": "199.80" }],
+    "payment": { "method": "cod", "status": "pending", "amount": "189.82" }
+  },
+  "errors": []
+}</code></pre>
+
+            <div class="param-label">Coupon Error Codes (422)</div>
+            <table class="param-table">
+              <thead><tr><th>Code</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr><td><code>coupon_not_found</code></td><td>Code does not exist</td></tr>
+                <tr><td><code>coupon_inactive</code></td><td>Coupon is disabled</td></tr>
+                <tr><td><code>coupon_not_started</code></td><td>Coupon not yet valid</td></tr>
+                <tr><td><code>coupon_expired</code></td><td>Coupon has expired</td></tr>
+                <tr><td><code>coupon_usage_limit_reached</code></td><td>Global usage limit hit</td></tr>
+                <tr><td><code>coupon_per_user_limit_reached</code></td><td>User has exceeded their allowed uses</td></tr>
+                <tr><td><code>coupon_min_order_not_met</code></td><td>Cart total below minimum order amount</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/orders</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">List the authenticated user's orders. Returns paginated list each with items and payment.</p>
+
+            <div class="param-label">Query Parameters</div>
+            <table class="param-table">
+              <thead><tr><th>Param</th><th>Type</th><th>Default</th></tr></thead>
+              <tbody>
+                <tr><td><code>page</code></td><td>int</td><td>1</td></tr>
+                <tr><td><code>per_page</code></td><td>int</td><td>15 (max 50)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/orders/{id}</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Get full details of a specific order. Only accessible by the order's owner.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  7 · PAYMENTS  ═══════════════════ -->
+      <div class="section-block" id="payments">
+        <h2>7. Payments</h2>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/orders/{id}/payment</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Returns the payment record for the order. Only the order's owner can view.</p>
+
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Payment retrieved",
+  "data": {
+    "id": 1,
+    "order_id": 1,
+    "method": "cod",
+    "status": "pending",
+    "amount": "189.82",
+    "transaction_id": null,
+    "gateway_response": null,
+    "paid_at": null
+  },
+  "errors": []
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  8 · COUPONS  ═══════════════════ -->
+      <div class="section-block" id="coupons">
+        <h2>8. Coupons</h2>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method POST">POST</span>
+            <span class="endpoint-path">/coupons/apply</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Validate a coupon code against the current order total.</p>
+
+            <div class="param-label">Request Body</div>
+            <table class="param-table">
+              <thead><tr><th>Field</th><th>Type</th><th>Required</th></tr></thead>
+              <tbody>
+                <tr><td><code>code</code></td><td>string</td><td class="req-yes">Yes</td></tr>
+                <tr><td><code>order_total</code></td><td>decimal</td><td class="req-no">No</td></tr>
+              </tbody>
+            </table>
+
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Coupon is valid",
+  "data": {
+    "coupon": { "id": 1, "code": "SAVE10", "type": "percent", "value": "10.00" },
+    "discount_amount": 15.00
+  },
+  "errors": []
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  9 · REVIEWS  ═══════════════════ -->
+      <div class="section-block" id="reviews">
+        <h2>9. Reviews</h2>
+        <div class="auth-note">All routes in this section require <strong>JWT authentication</strong>.</div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method POST">POST</span>
+            <span class="endpoint-path">/products/{product_id}/reviews</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Submit a review. The authenticated user must have a <strong>delivered</strong> order containing this product. One review per product per user.</p>
+
+            <div class="param-label">Request Body</div>
+            <table class="param-table">
+              <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Rules</th></tr></thead>
+              <tbody>
+                <tr><td><code>rating</code></td><td>int</td><td class="req-yes">Yes</td><td>1–5</td></tr>
+                <tr><td><code>title</code></td><td>string</td><td class="req-no">No</td><td>Max 150 chars</td></tr>
+                <tr><td><code>body</code></td><td>string</td><td class="req-no">No</td><td>Max 2000 chars</td></tr>
+              </tbody>
+            </table>
+
+            <div class="param-label">Error Codes</div>
+            <table class="param-table">
+              <thead><tr><th>Code</th><th>Meaning</th></tr></thead>
+              <tbody>
+                <tr><td><code>product_not_found</code></td><td>Product does not exist</td></tr>
+                <tr><td><code>purchase_required</code></td><td>No delivered order found with this product</td></tr>
+                <tr><td><code>already_reviewed</code></td><td>User already reviewed this product</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method PUT">PUT</span>
+            <span class="endpoint-path">/products/{product_id}/reviews/{review_id}</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Edit the authenticated user's own review. All fields optional.</p>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method DELETE">DELETE</span>
+            <span class="endpoint-path">/products/{product_id}/reviews/{review_id}</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Delete the authenticated user's own review.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  10 · WISHLIST  ═══════════════════ -->
+      <div class="section-block" id="wishlist">
+        <h2>10. Wishlist</h2>
+        <div class="auth-note">All routes in this section require <strong>JWT authentication</strong>.</div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/wishlist</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Wishlist retrieved",
+  "data": [
+    {
+      "id": 1,
+      "product_id": 1,
+      "product_name": "Wireless Bluetooth Earbuds",
+      "slug": "wireless-bluetooth-earbuds",
+      "price": "129.90",
+      "sale_price": "99.90",
+      "stock": 144,
+      "added_at": "2026-04-07 10:00:00"
+    }
+  ],
+  "errors": []
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method POST">POST</span>
+            <span class="endpoint-path">/wishlist/{product_id}</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Toggle a product in the wishlist — adds if not present, removes if already present.</p>
+
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Product added to wishlist",
+  "data": { "action": "added" },
+  "errors": []
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  11 · ADMIN PRODUCTS  ═══════════════════ -->
+      <div class="section-block" id="admin-products">
+        <h2>11. Admin — Products</h2>
+        <div class="auth-note">All admin routes require <strong>JWT authentication</strong> and the <strong>admin role</strong>.</div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/admin/products</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Paginated product list with admin-only filters.</p>
+
+            <div class="param-label">Query Parameters</div>
+            <table class="param-table">
+              <thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td colspan="3" style="color:#888;font-style:italic;">All public <code>/products</code> params, plus:</td></tr>
+                <tr><td><code>is_active</code></td><td>int</td><td><code>0</code> or <code>1</code></td></tr>
+                <tr><td><code>is_featured</code></td><td>int</td><td><code>0</code> or <code>1</code></td></tr>
+                <tr><td><code>low_stock</code></td><td>int</td><td><code>1</code> = show items with stock ≤ 5</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method POST">POST</span>
+            <span class="endpoint-path">/admin/products</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Create a new product.</p>
+
+            <div class="param-label">Request Body</div>
+            <table class="param-table">
+              <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Rules</th></tr></thead>
+              <tbody>
+                <tr><td><code>name</code></td><td>string</td><td class="req-yes">Yes</td><td>2–200 chars</td></tr>
+                <tr><td><code>price</code></td><td>decimal</td><td class="req-yes">Yes</td><td>&gt; 0</td></tr>
+                <tr><td><code>category_id</code></td><td>int</td><td class="req-no">No</td><td>Must be valid category</td></tr>
+                <tr><td><code>description</code></td><td>string</td><td class="req-no">No</td><td></td></tr>
+                <tr><td><code>sale_price</code></td><td>decimal</td><td class="req-no">No</td><td>&gt; 0</td></tr>
+                <tr><td><code>stock</code></td><td>int</td><td class="req-no">No</td><td>≥ 0, default 0</td></tr>
+                <tr><td><code>sku</code></td><td>string</td><td class="req-no">No</td><td>Max 100 chars, unique</td></tr>
+                <tr><td><code>thumbnail</code></td><td>string</td><td class="req-no">No</td><td></td></tr>
+                <tr><td><code>is_active</code></td><td>int</td><td class="req-no">No</td><td><code>0</code> or <code>1</code>, default <code>1</code></td></tr>
+                <tr><td><code>is_featured</code></td><td>int</td><td class="req-no">No</td><td><code>0</code> or <code>1</code>, default <code>0</code></td></tr>
+                <tr><td><code>variants</code></td><td>array</td><td class="req-no">No</td><td>See variant object below</td></tr>
+              </tbody>
+            </table>
+
+            <div class="code-label">Variant Object</div>
+            <pre><code class="language-json">{
+  "name": "Color",
+  "value": "Red",
+  "price_adjustment": 5.00,
+  "stock": 50,
+  "sku": "PROD-001-RED"
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method PUT">PUT</span>
+            <span class="endpoint-path">/admin/products/{id}</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Update a product. All fields optional. If <code>variants</code> is provided, existing variants are replaced.</p>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method DELETE">DELETE</span>
+            <span class="endpoint-path">/admin/products/{id}</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Soft-delete a product (sets <code>deleted_at</code>).</p>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method POST">POST</span>
+            <span class="endpoint-path">/admin/products/{id}/images</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Upload product images. Accepts <code>multipart/form-data</code>.</p>
+
+            <div class="param-label">Form Fields</div>
+            <table class="param-table">
+              <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>images</code></td><td>file(s)</td><td>JPEG, PNG, WebP, or GIF. Multiple files accepted.</td></tr>
+                <tr><td><code>is_primary</code></td><td>int</td><td><code>1</code> = mark first uploaded image as primary</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method DELETE">DELETE</span>
+            <span class="endpoint-path">/admin/products/{id}/images/{image_id}</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Delete a product image (also removes the file from disk).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  12 · ADMIN ORDERS  ═══════════════════ -->
+      <div class="section-block" id="admin-orders">
+        <h2>12. Admin — Orders</h2>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/admin/orders</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="param-label">Query Parameters</div>
+            <table class="param-table">
+              <thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>page</code></td><td>int</td><td>Default 1</td></tr>
+                <tr><td><code>per_page</code></td><td>int</td><td>Default 15, max 100</td></tr>
+                <tr><td><code>status</code></td><td>string</td><td><code>pending</code> | <code>confirmed</code> | <code>processing</code> | <code>shipped</code> | <code>delivered</code> | <code>cancelled</code> | <code>refunded</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method PUT">PUT</span>
+            <span class="endpoint-path">/admin/orders/{id}/status</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Update an order's status. Setting status to <code>delivered</code> automatically marks payment as <code>paid</code>.</p>
+
+            <div class="code-label">Request Body</div>
+            <pre><code class="language-json">{ "status": "shipped" }</code></pre>
+
+            <div class="param-label">Allowed Values</div>
+            <p style="font-size:.83rem;color:var(--muted);">
+              <code>pending</code> &nbsp;|&nbsp; <code>confirmed</code> &nbsp;|&nbsp; <code>processing</code> &nbsp;|&nbsp;
+              <code>shipped</code> &nbsp;|&nbsp; <code>delivered</code> &nbsp;|&nbsp; <code>cancelled</code> &nbsp;|&nbsp; <code>refunded</code>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  13 · ADMIN PAYMENTS  ═══════════════════ -->
+      <div class="section-block" id="admin-payments">
+        <h2>13. Admin — Payments</h2>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/admin/orders/{order_id}/payment</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Get payment record for any order (no user-scope restriction).</p>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method PUT">PUT</span>
+            <span class="endpoint-path">/admin/orders/{order_id}/payment</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Manually update payment status.</p>
+
+            <div class="param-label">Request Body</div>
+            <table class="param-table">
+              <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Allowed Values</th></tr></thead>
+              <tbody>
+                <tr><td><code>status</code></td><td>string</td><td class="req-yes">Yes</td><td><code>paid</code> | <code>failed</code> | <code>refunded</code></td></tr>
+                <tr><td><code>transaction_id</code></td><td>string</td><td class="req-no">No</td><td></td></tr>
+                <tr><td><code>gateway_response</code></td><td>string</td><td class="req-no">No</td><td></td></tr>
+              </tbody>
+            </table>
+
+            <div class="param-label">Allowed Transitions</div>
+            <table class="param-table">
+              <thead><tr><th>From</th><th>To</th></tr></thead>
+              <tbody>
+                <tr><td><code>pending</code></td><td><code>paid</code>, <code>failed</code>, <code>refunded</code></td></tr>
+                <tr><td><code>paid</code></td><td><code>refunded</code></td></tr>
+                <tr><td><code>failed</code></td><td>— (terminal)</td></tr>
+                <tr><td><code>refunded</code></td><td>— (terminal)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  14 · ADMIN USERS  ═══════════════════ -->
+      <div class="section-block" id="admin-users">
+        <h2>14. Admin — Users</h2>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/admin/users</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="param-label">Query Parameters</div>
+            <table class="param-table">
+              <thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>page</code></td><td>int</td><td>Default 1</td></tr>
+                <tr><td><code>per_page</code></td><td>int</td><td>Default 15, max 100</td></tr>
+                <tr><td><code>role</code></td><td>string</td><td><code>customer</code> | <code>admin</code></td></tr>
+                <tr><td><code>search</code></td><td>string</td><td>Search by name or email</td></tr>
+                <tr><td><code>status</code></td><td>int</td><td><code>1</code> = active, <code>0</code> = inactive</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/admin/users/{id}</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Get a single user by ID.</p>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method PUT">PUT</span>
+            <span class="endpoint-path">/admin/users/{id}/status</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Activate or deactivate a user. Cannot change your own account.</p>
+            <div class="code-label">Request Body</div>
+            <pre><code class="language-json">{ "is_active": 0 }</code></pre>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method PUT">PUT</span>
+            <span class="endpoint-path">/admin/users/{id}/role</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Promote or demote a user. Cannot change your own account.</p>
+            <div class="code-label">Request Body</div>
+            <pre><code class="language-json">{ "role": "admin" }</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  15 · ADMIN COUPONS  ═══════════════════ -->
+      <div class="section-block" id="admin-coupons">
+        <h2>15. Admin — Coupons</h2>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/admin/coupons</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body"><p class="endpoint-desc">Paginated coupon list.</p></div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/admin/coupons/{id}</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body"><p class="endpoint-desc">Get a single coupon.</p></div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method POST">POST</span>
+            <span class="endpoint-path">/admin/coupons</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Create a coupon.</p>
+
+            <div class="param-label">Request Body</div>
+            <table class="param-table">
+              <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Rules</th></tr></thead>
+              <tbody>
+                <tr><td><code>code</code></td><td>string</td><td class="req-yes">Yes</td><td>Max 50 chars</td></tr>
+                <tr><td><code>type</code></td><td>string</td><td class="req-yes">Yes</td><td><code>percent</code> | <code>fixed</code></td></tr>
+                <tr><td><code>value</code></td><td>decimal</td><td class="req-yes">Yes</td><td>&gt; 0; for <code>percent</code> max 100</td></tr>
+                <tr><td><code>description</code></td><td>string</td><td class="req-no">No</td><td>Max 255 chars</td></tr>
+                <tr><td><code>min_order_amount</code></td><td>decimal</td><td class="req-no">No</td><td>Minimum cart total</td></tr>
+                <tr><td><code>max_discount_amount</code></td><td>decimal</td><td class="req-no">No</td><td>Cap for percent discounts</td></tr>
+                <tr><td><code>usage_limit</code></td><td>int</td><td class="req-no">No</td><td>Total redemption cap</td></tr>
+                <tr><td><code>usage_limit_per_user</code></td><td>int</td><td class="req-no">No</td><td>Per-user cap</td></tr>
+                <tr><td><code>is_active</code></td><td>int</td><td class="req-no">No</td><td><code>0</code> or <code>1</code></td></tr>
+                <tr><td><code>starts_at</code></td><td>datetime</td><td class="req-no">No</td><td><code>Y-m-d H:i:s</code></td></tr>
+                <tr><td><code>expires_at</code></td><td>datetime</td><td class="req-no">No</td><td><code>Y-m-d H:i:s</code></td></tr>
+              </tbody>
+            </table>
+
+            <div class="code-label">Example Request</div>
+            <pre><code class="language-json">{
+  "code": "SUMMER20",
+  "type": "percent",
+  "value": 20,
+  "min_order_amount": 50.00,
+  "usage_limit": 100,
+  "usage_limit_per_user": 1,
+  "starts_at": "2026-04-01 00:00:00",
+  "expires_at": "2026-12-31 23:59:59",
+  "is_active": 1
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method PUT">PUT</span>
+            <span class="endpoint-path">/admin/coupons/{id}</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body"><p class="endpoint-desc">Update a coupon. All fields optional.</p></div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method DELETE">DELETE</span>
+            <span class="endpoint-path">/admin/coupons/{id}</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body"><p class="endpoint-desc">Delete a coupon.</p></div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  16 · ADMIN REVIEWS  ═══════════════════ -->
+      <div class="section-block" id="admin-reviews">
+        <h2>16. Admin — Reviews</h2>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/admin/reviews</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <div class="param-label">Query Parameters</div>
+            <table class="param-table">
+              <thead><tr><th>Param</th><th>Type</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>page</code></td><td>int</td><td>Default 1</td></tr>
+                <tr><td><code>per_page</code></td><td>int</td><td>Default 15, max 100</td></tr>
+                <tr><td><code>status</code></td><td>string</td><td><code>pending</code> | <code>approved</code></td></tr>
+              </tbody>
+            </table>
+            <p style="font-size:.83rem;color:var(--muted);margin-top:8px;">Response includes <code>reviewer_name</code>, <code>reviewer_email</code>, and <code>product_name</code>.</p>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method PUT">PUT</span>
+            <span class="endpoint-path">/admin/reviews/{id}/approve</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Approve or hide a review.</p>
+            <div class="code-label">Request Body</div>
+            <pre><code class="language-json">{ "is_approved": 1 }</code></pre>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method DELETE">DELETE</span>
+            <span class="endpoint-path">/admin/reviews/{id}</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body"><p class="endpoint-desc">Hard-delete a review.</p></div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  17 · ADMIN DASHBOARD  ═══════════════════ -->
+      <div class="section-block" id="admin-dashboard">
+        <h2>17. Admin — Dashboard &amp; Reports</h2>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/admin/dashboard</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Returns KPI summary. Cached for 1 minute.</p>
+
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "status": true,
+  "message": "Dashboard summary retrieved.",
+  "data": {
+    "orders":   { "total": 6, "today": 0, "this_month": 6, "pending": 1 },
+    "revenue":  { "total": 519.40, "today": 0, "this_month": 519.40 },
+    "customers":{ "total": 2, "today": 0, "this_month": 2 },
+    "products": { "total": 3, "low_stock": 0 },
+    "pending_reviews": 0,
+    "recent_orders": [{ "id": 6, "order_number": "GGD-...", "status": "pending", "total": "50.00", "customer_name": "Customer User" }],
+    "low_stock_products": []
+  },
+  "errors": []
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/admin/reports/sales</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Daily/weekly/monthly sales breakdown.</p>
+
+            <div class="param-label">Query Parameters</div>
+            <table class="param-table">
+              <thead><tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>start_date</code></td><td>date</td><td>First of current month</td><td><code>Y-m-d</code> format</td></tr>
+                <tr><td><code>end_date</code></td><td>date</td><td>Today</td><td><code>Y-m-d</code> format</td></tr>
+                <tr><td><code>group_by</code></td><td>string</td><td>day</td><td><code>day</code> | <code>week</code> | <code>month</code></td></tr>
+              </tbody>
+            </table>
+
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "data": {
+    "start_date": "2026-04-01",
+    "end_date": "2026-04-30",
+    "group_by": "day",
+    "totals": { "order_count": 6, "revenue": 519.40, "discount_given": 0, "avg_order_value": 86.57 },
+    "data": [
+      { "period": "2026-04-07", "order_count": 6, "revenue": 519.40, "discount_given": 0, "avg_order_value": 86.57 }
+    ]
+  }
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/admin/reports/top-products</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Best-selling or highest-revenue products.</p>
+
+            <div class="param-label">Query Parameters</div>
+            <table class="param-table">
+              <thead><tr><th>Param</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>limit</code></td><td>int</td><td>10</td><td>Max 50</td></tr>
+                <tr><td><code>sort_by</code></td><td>string</td><td>revenue</td><td><code>revenue</code> | <code>quantity</code></td></tr>
+                <tr><td><code>start_date</code></td><td>date</td><td>—</td><td>Optional <code>Y-m-d</code></td></tr>
+                <tr><td><code>end_date</code></td><td>date</td><td>—</td><td>Optional <code>Y-m-d</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method GET">GET</span>
+            <span class="endpoint-path">/admin/reports/orders-by-status</span>
+            <div class="endpoint-auth"><span class="chip chip-jwt">JWT</span><span class="chip chip-admin">Admin</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Order count and revenue grouped by status.</p>
+
+            <div class="code-label">Response 200</div>
+            <pre><code class="language-json">{
+  "data": [
+    { "status": "delivered", "order_count": 4, "revenue": 450.00 },
+    { "status": "pending",   "order_count": 2, "revenue": 0 }
+  ]
+}</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  18 · WEBHOOKS  ═══════════════════ -->
+      <div class="section-block" id="webhooks">
+        <h2>18. Webhooks</h2>
+
+        <div class="endpoint">
+          <div class="endpoint-header" onclick="toggleEndpoint(this)">
+            <span class="method POST">POST</span>
+            <span class="endpoint-path">/webhooks/payment/{gateway}</span>
+            <div class="endpoint-auth"><span class="chip chip-pub">public</span></div>
+            <span class="endpoint-arrow">▼</span>
+          </div>
+          <div class="endpoint-body">
+            <p class="endpoint-desc">Receives payment status notifications from external gateways. Secured by payload validation — no JWT required.</p>
+
+            <div class="param-label">URL — gateway values</div>
+            <p style="font-size:.83rem;color:var(--muted);margin-bottom:14px;">
+              <code>fpx</code> &nbsp;|&nbsp; <code>card</code> &nbsp;|&nbsp; <code>ewallet</code> &nbsp;|&nbsp; <code>bank_transfer</code> &nbsp;|&nbsp; <code>cod</code>
+            </p>
+
+            <div class="param-label">Request Body</div>
+            <table class="param-table">
+              <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+              <tbody>
+                <tr><td><code>order_number</code></td><td>string</td><td class="req-yes">Yes</td><td>GGD order number e.g. <code>GGD-AB12CD34-20260407</code></td></tr>
+                <tr><td><code>status</code></td><td>string</td><td class="req-yes">Yes</td><td><code>success</code> | <code>failed</code> | <code>refunded</code></td></tr>
+                <tr><td><code>transaction_id</code></td><td>string</td><td class="req-no">No</td><td>Gateway transaction reference</td></tr>
+                <tr><td><code>gateway_response</code></td><td>string</td><td class="req-no">No</td><td>Raw gateway response (JSON string)</td></tr>
+              </tbody>
+            </table>
+
+            <div class="code-label">Example Request</div>
+            <pre><code class="language-json">{
+  "order_number": "GGD-AB12CD34-20260407",
+  "status": "success",
+  "transaction_id": "FPX-TXN-001",
+  "gateway_response": "{\"code\":\"00\",\"message\":\"Success\"}"
+}</code></pre>
+
+            <div class="alert alert-warning" style="margin-top:14px;">
+              Before going live, implement HMAC signature verification per gateway.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════  ERROR REFERENCE  ═══════════════════ -->
+      <div class="section-block" id="errors">
+        <h2>Error Reference</h2>
+
+        <h3 style="font-size:1rem;margin-bottom:8px;">Validation Error <span class="sc sc-4xx">422</span></h3>
+        <pre><code class="language-json">{
+  "status": false,
+  "message": "Validation failed",
+  "data": null,
+  "errors": {
+    "email": "The email field must contain a valid email address.",
+    "password": "The password field must be at least 8 characters in length."
+  }
+}</code></pre>
+
+        <h3 style="font-size:1rem;margin:20px 0 8px;">Unauthorized <span class="sc sc-4xx">401</span></h3>
+        <pre><code class="language-json">{
+  "status": false,
+  "message": "Unauthorized",
+  "data": null,
+  "errors": []
+}</code></pre>
+
+        <h3 style="font-size:1rem;margin:20px 0 8px;">Not Found <span class="sc sc-4xx">404</span></h3>
+        <pre><code class="language-json">{
+  "status": false,
+  "message": "Product not found",
+  "data": null,
+  "errors": []
+}</code></pre>
+
+        <h3 style="font-size:1rem;margin:20px 0 8px;">Server Error <span class="sc sc-5xx">500</span></h3>
+        <pre><code class="language-json">{
+  "status": false,
+  "message": "An unexpected error occurred. Please try again later.",
+  "data": null,
+  "errors": []
+}</code></pre>
+      </div>
+
+    </section>
+  </main>
+</div>
+
+<!-- BACK TO TOP -->
+<button id="back-top" title="Back to top">↑</button>
+
+<!-- highlight.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+  // Syntax highlight
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+  });
+
+  // Collapse/expand endpoints
+  function toggleEndpoint(header) {
+    header.closest('.endpoint').classList.toggle('collapsed');
+  }
+
+  // Sidebar active link + smooth scroll
+  const navLinks = document.querySelectorAll('.nav-link');
+  const sections = document.querySelectorAll('.section-block');
+  const mainEl   = document.getElementById('main-content');
+
+  mainEl.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (mainEl.scrollTop + 80 >= s.offsetTop) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+
+    // back-to-top
+    document.getElementById('back-top').classList.toggle('visible', mainEl.scrollTop > 300);
+  });
+
+  navLinks.forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // mobile: close sidebar
+      document.getElementById('sidebar').classList.remove('open');
+    });
+  });
+
+  // Back to top
+  document.getElementById('back-top').addEventListener('click', () => {
+    mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // Hamburger
+  document.getElementById('hamburger').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+  });
+
+  // Sidebar search filter
+  document.getElementById('sidebar-search').addEventListener('input', function () {
+    const q = this.value.toLowerCase();
+    navLinks.forEach(a => {
+      a.style.display = a.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  });
+</script>
+</body>
+</html>

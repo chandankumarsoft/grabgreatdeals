@@ -1,0 +1,763 @@
+{
+  "info": {
+    "name": "GrabGreatDeals API",
+    "description": "Complete REST API collection for GrabGreatDeals eCommerce platform.\n\nBase URL: http://localhost:8080/api/v1\n\nAuth: After logging in, copy the `token` from the response and set the `token` collection variable. All authenticated requests use Bearer token automatically via the collection variable.\n\nTest credentials:\n- Admin:    admin@grabgreatdeals.com / Admin@1234\n- Customer: customer@grabgreatdeals.com / Customer@1234",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"Password@1234\",\n  \"password_confirm\": \"Password@1234\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.token) {",
+                  "  pm.collectionVariables.set('token', json.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer@grabgreatdeals.com\",\n  \"password\": \"Customer@1234\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.token) {",
+                  "  pm.collectionVariables.set('token', json.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@grabgreatdeals.com\",\n  \"password\": \"Admin@1234\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+            "method": "POST",
+            "url": "{{base_url}}/auth/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products (Public)",
+      "item": [
+        {
+          "name": "List Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/products",
+              "host": ["{{base_url}}"],
+              "path": ["products"],
+              "query": [
+                {"key": "page", "value": "1", "disabled": true},
+                {"key": "per_page", "value": "15", "disabled": true},
+                {"key": "category", "value": "electronics", "disabled": true},
+                {"key": "search", "value": "earbuds", "disabled": true},
+                {"key": "featured", "value": "1", "disabled": true},
+                {"key": "min_price", "value": "10", "disabled": true},
+                {"key": "max_price", "value": "200", "disabled": true},
+                {"key": "min_rating", "value": "4", "disabled": true},
+                {"key": "in_stock", "value": "1", "disabled": true},
+                {"key": "on_sale", "value": "1", "disabled": true},
+                {"key": "sort", "value": "price", "disabled": true, "description": "price | name | rating | popularity | created_at"},
+                {"key": "order", "value": "ASC", "disabled": true, "description": "ASC | DESC"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Product by Slug",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/products/wireless-bluetooth-earbuds"
+          }
+        },
+        {
+          "name": "Get Product Reviews",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/products/1/reviews",
+              "host": ["{{base_url}}"],
+              "path": ["products", "1", "reviews"],
+              "query": [
+                {"key": "page", "value": "1", "disabled": true},
+                {"key": "per_page", "value": "10", "disabled": true}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search (Public)",
+      "item": [
+        {
+          "name": "Search Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/search?q=earbuds",
+              "host": ["{{base_url}}"],
+              "path": ["search"],
+              "query": [
+                {"key": "q", "value": "earbuds"},
+                {"key": "category", "value": "", "disabled": true},
+                {"key": "min_price", "value": "", "disabled": true},
+                {"key": "max_price", "value": "", "disabled": true},
+                {"key": "limit", "value": "20", "disabled": true}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Suggestions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/search/suggestions?q=ear",
+              "query": [
+                {"key": "q", "value": "ear"},
+                {"key": "limit", "value": "8", "disabled": true}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Profile",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/user/profile"
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/user/profile",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"phone\": \"0123456789\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Addresses",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/user/addresses"
+          }
+        },
+        {
+          "name": "Add Address",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/user/addresses",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Home\",\n  \"address_line\": \"123 Main Street\",\n  \"city\": \"Kuala Lumpur\",\n  \"state\": \"Selangor\",\n  \"postcode\": \"50000\",\n  \"country\": \"Malaysia\",\n  \"is_default\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Address",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/user/addresses/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cart",
+      "item": [
+        {
+          "name": "Get Cart",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/cart"
+          }
+        },
+        {
+          "name": "Add Item",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/cart",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": 1,\n  \"quantity\": 2,\n  \"variant_id\": null\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Item Quantity",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/cart/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 3\n}"
+            }
+          }
+        },
+        {
+          "name": "Remove Item",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/cart/1"
+          }
+        },
+        {
+          "name": "Clear Cart",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/cart"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Checkout",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/orders",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"shipping_name\": \"John Doe\",\n  \"shipping_phone\": \"0123456789\",\n  \"shipping_address\": \"123 Main Street, Kuala Lumpur 50000\",\n  \"payment_method\": \"cod\",\n  \"shipping_fee\": 10.00,\n  \"notes\": \"Please leave at door\",\n  \"coupon_code\": \"\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List My Orders",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "query": [
+                {"key": "page", "value": "1", "disabled": true},
+                {"key": "per_page", "value": "15", "disabled": true}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Order Details",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/orders/1"
+          }
+        },
+        {
+          "name": "Get Order Payment",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/orders/1/payment"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Coupons",
+      "item": [
+        {
+          "name": "Apply Coupon",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/coupons/apply",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"SAVE10\",\n  \"order_total\": 150.00\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Submit Review",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/products/1/reviews",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 5,\n  \"title\": \"Great product!\",\n  \"body\": \"Really happy with this purchase.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Review",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/products/1/reviews/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rating\": 4,\n  \"title\": \"Updated title\",\n  \"body\": \"Updated review body.\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/products/1/reviews/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Wishlist",
+      "item": [
+        {
+          "name": "Get Wishlist",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/wishlist"
+          }
+        },
+        {
+          "name": "Toggle Wishlist Item",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/wishlist/1",
+            "description": "Adds the product if not wishlisted, removes it if already wishlisted."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin — Products",
+      "item": [
+        {
+          "name": "List Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/admin/products",
+              "query": [
+                {"key": "page", "value": "1", "disabled": true},
+                {"key": "per_page", "value": "15", "disabled": true},
+                {"key": "search", "value": "", "disabled": true},
+                {"key": "category", "value": "", "disabled": true},
+                {"key": "is_active", "value": "1", "disabled": true},
+                {"key": "is_featured", "value": "1", "disabled": true},
+                {"key": "low_stock", "value": "1", "disabled": true},
+                {"key": "sort", "value": "created_at", "disabled": true},
+                {"key": "order", "value": "DESC", "disabled": true}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/admin/products",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Product\",\n  \"category_id\": 1,\n  \"description\": \"Product description here.\",\n  \"price\": 99.90,\n  \"sale_price\": 79.90,\n  \"stock\": 100,\n  \"sku\": \"NEW-001\",\n  \"is_active\": 1,\n  \"is_featured\": 0,\n  \"variants\": [\n    {\n      \"name\": \"Color\",\n      \"value\": \"Red\",\n      \"price_adjustment\": 0,\n      \"stock\": 50,\n      \"sku\": \"NEW-001-RED\"\n    }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/admin/products/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Product Name\",\n  \"price\": 89.90,\n  \"stock\": 150,\n  \"is_active\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/admin/products/1"
+          }
+        },
+        {
+          "name": "Upload Product Images",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/admin/products/1/images",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {"key": "images", "type": "file", "src": ""},
+                {"key": "is_primary", "value": "1", "type": "text"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Product Image",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/admin/products/1/images/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin — Orders",
+      "item": [
+        {
+          "name": "List Orders",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/admin/orders",
+              "query": [
+                {"key": "page", "value": "1", "disabled": true},
+                {"key": "per_page", "value": "15", "disabled": true},
+                {"key": "status", "value": "pending", "disabled": true, "description": "pending | confirmed | processing | shipped | delivered | cancelled | refunded"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/admin/orders/1/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"confirmed\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Order Payment",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/admin/orders/1/payment"
+          }
+        },
+        {
+          "name": "Update Order Payment",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/admin/orders/1/payment",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"paid\",\n  \"transaction_id\": \"TXN-123456\",\n  \"gateway_response\": \"Success\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin — Users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/admin/users",
+              "query": [
+                {"key": "page", "value": "1", "disabled": true},
+                {"key": "per_page", "value": "15", "disabled": true},
+                {"key": "role", "value": "customer", "disabled": true, "description": "customer | admin"},
+                {"key": "search", "value": "", "disabled": true},
+                {"key": "status", "value": "1", "disabled": true, "description": "1 = active, 0 = inactive"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/admin/users/1"
+          }
+        },
+        {
+          "name": "Update User Status",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/admin/users/2/status",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_active\": 0\n}"
+            }
+          }
+        },
+        {
+          "name": "Update User Role",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/admin/users/2/role",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"admin\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin — Coupons",
+      "item": [
+        {
+          "name": "List Coupons",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/admin/coupons",
+              "query": [
+                {"key": "page", "value": "1", "disabled": true},
+                {"key": "per_page", "value": "15", "disabled": true}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Coupon by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/admin/coupons/1"
+          }
+        },
+        {
+          "name": "Create Coupon",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/admin/coupons",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"SUMMER20\",\n  \"type\": \"percent\",\n  \"value\": 20,\n  \"min_order_amount\": 50.00,\n  \"max_uses\": 100,\n  \"max_uses_per_user\": 1,\n  \"starts_at\": \"2026-04-01\",\n  \"expires_at\": \"2026-12-31\",\n  \"is_active\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Coupon",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/admin/coupons/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_active\": 0,\n  \"max_uses\": 200\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Coupon",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/admin/coupons/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin — Reviews",
+      "item": [
+        {
+          "name": "List Reviews",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/admin/reviews",
+              "query": [
+                {"key": "page", "value": "1", "disabled": true},
+                {"key": "per_page", "value": "15", "disabled": true},
+                {"key": "status", "value": "pending", "disabled": true, "description": "pending | approved"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Approve / Hide Review",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/admin/reviews/1/approve",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_approved\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/admin/reviews/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin — Dashboard & Reports",
+      "item": [
+        {
+          "name": "Dashboard Summary",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/admin/dashboard"
+          }
+        },
+        {
+          "name": "Sales Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/admin/reports/sales",
+              "query": [
+                {"key": "start_date", "value": "2026-04-01", "description": "Y-m-d format"},
+                {"key": "end_date", "value": "2026-04-30", "description": "Y-m-d format"},
+                {"key": "group_by", "value": "day", "description": "day | week | month"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Top Products Report",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/admin/reports/top-products",
+              "query": [
+                {"key": "limit", "value": "10", "description": "1–50"},
+                {"key": "sort_by", "value": "revenue", "description": "revenue | quantity"},
+                {"key": "start_date", "value": "", "disabled": true},
+                {"key": "end_date", "value": "", "disabled": true}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Orders by Status",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/admin/reports/orders-by-status"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhooks",
+      "item": [
+        {
+          "name": "Payment Webhook (FPX)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/webhooks/payment/fpx",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": 1,\n  \"status\": \"paid\",\n  \"transaction_id\": \"FPX-TXN-001\",\n  \"gateway_response\": \"{\\\"code\\\":\\\"00\\\",\\\"message\\\":\\\"Success\\\"}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Payment Webhook (Card)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{base_url}}/webhooks/payment/card",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"order_id\": 1,\n  \"status\": \"paid\",\n  \"transaction_id\": \"CARD-TXN-001\",\n  \"gateway_response\": \"{\\\"code\\\":\\\"00\\\",\\\"message\\\":\\\"Approved\\\"}\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
