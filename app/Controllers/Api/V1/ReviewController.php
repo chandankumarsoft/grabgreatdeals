@@ -44,7 +44,7 @@ class ReviewController extends BaseApiController
             return $this->respondValidationError($this->validator->getErrors());
         }
 
-        $userId = (int) $this->request->jwtPayload->sub;
+        $userId = (int) $this->getAuthUserId();
         $result = $this->reviewService->submit($userId, $productId, $this->request->getJSON(true));
 
         if ($result === 'product_not_found') {
@@ -78,7 +78,7 @@ class ReviewController extends BaseApiController
             return $this->respondValidationError($this->validator->getErrors());
         }
 
-        $userId = (int) $this->request->jwtPayload->sub;
+        $userId = (int) $this->getAuthUserId();
         $result = $this->reviewService->update($userId, $reviewId, $this->request->getJSON(true));
 
         if ($result === false) {
@@ -94,7 +94,7 @@ class ReviewController extends BaseApiController
      */
     public function delete(int $productId, int $reviewId)
     {
-        $userId = (int) $this->request->jwtPayload->sub;
+        $userId = (int) $this->getAuthUserId();
 
         if (! $this->reviewService->delete($userId, $reviewId)) {
             return $this->respondNotFound('Review not found');

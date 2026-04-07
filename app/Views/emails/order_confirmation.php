@@ -121,7 +121,7 @@
             <div style="font-size:14px; line-height:1.7; background:#f8fafc; padding:12px 16px; border-radius:6px;">
                 <strong><?= esc($order['shipping_name']) ?></strong><br>
                 <?= esc($order['shipping_phone']) ?><br>
-                <?= nl2br(esc($order['shipping_address'])) ?>
+                <?= nl2br(esc((string) $order['shipping_address'])) ?>
             </div>
         </td>
     </tr>

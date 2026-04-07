@@ -28,7 +28,7 @@ class OrderController extends BaseApiController
             return $this->respondValidationError($this->validator->getErrors());
         }
 
-        $userId = (int) $this->request->jwtPayload->sub;
+        $userId = (int) $this->getAuthUserId();
         $result = $this->orderService->checkout($userId, $this->request->getJSON(true));
 
         if ($result === 'empty_cart') {
@@ -62,7 +62,7 @@ class OrderController extends BaseApiController
 
     public function index()
     {
-        $userId  = (int) $this->request->jwtPayload->sub;
+        $userId  = (int) $this->getAuthUserId();
         $perPage = max(1, min(50, (int) ($this->request->getGet('per_page') ?? 15)));
         $page    = max(1, (int) ($this->request->getGet('page') ?? 1));
 
@@ -73,7 +73,7 @@ class OrderController extends BaseApiController
 
     public function show(int $orderId)
     {
-        $userId = (int) $this->request->jwtPayload->sub;
+        $userId = (int) $this->getAuthUserId();
         $order  = $this->orderService->getOrderById($userId, $orderId);
 
         if (! $order) {

@@ -19,7 +19,7 @@ class WishlistController extends BaseApiController
      */
     public function index()
     {
-        $userId = (int) $this->request->jwtPayload->sub;
+        $userId = (int) $this->getAuthUserId();
         $items  = $this->wishlistService->getList($userId);
 
         return $this->respondSuccess('Wishlist retrieved', [
@@ -35,7 +35,7 @@ class WishlistController extends BaseApiController
      */
     public function toggle(int $productId)
     {
-        $userId = (int) $this->request->jwtPayload->sub;
+        $userId = (int) $this->getAuthUserId();
         $result = $this->wishlistService->toggle($userId, $productId);
 
         if ($result === false) {

@@ -148,7 +148,7 @@ class OrderService
         // Send confirmation email — failure is logged, never breaks the order response
         $user = $this->userModel->find($userId);
         if ($user && $result) {
-            $this->emailService->sendOrderConfirmation($result, $user['email'], $user['name']);
+            $this->emailService->sendOrderConfirmation($result, (string) $user['email'], (string) $user['name']);
         }
 
         return $result;
@@ -209,7 +209,7 @@ class OrderService
         if ($result) {
             $user = $this->userModel->find($result['user_id']);
             if ($user) {
-                $this->emailService->sendOrderStatusUpdate($result, $user['email'], $user['name']);
+                $this->emailService->sendOrderStatusUpdate($result, (string) $user['email'], (string) $user['name']);
             }
         }
 

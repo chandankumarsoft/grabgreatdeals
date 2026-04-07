@@ -15,7 +15,7 @@ class CartController extends BaseApiController
 
     public function index()
     {
-        $userId = (int) $this->request->jwtPayload->sub;
+        $userId = (int) $this->getAuthUserId();
         $cart   = $this->cartService->getCart($userId);
 
         return $this->respondSuccess('Cart retrieved', $cart);
@@ -33,7 +33,7 @@ class CartController extends BaseApiController
             return $this->respondValidationError($this->validator->getErrors());
         }
 
-        $userId = (int) $this->request->jwtPayload->sub;
+        $userId = (int) $this->getAuthUserId();
         $result = $this->cartService->addItem($userId, $this->request->getJSON(true));
 
         return $this->handleServiceResult($result, 'Item added to cart');
@@ -49,7 +49,7 @@ class CartController extends BaseApiController
             return $this->respondValidationError($this->validator->getErrors());
         }
 
-        $userId   = (int) $this->request->jwtPayload->sub;
+        $userId   = (int) $this->getAuthUserId();
         $quantity = (int) $this->request->getJSON(true)['quantity'];
         $result   = $this->cartService->updateItem($userId, $itemId, $quantity);
 
@@ -58,7 +58,7 @@ class CartController extends BaseApiController
 
     public function remove(int $itemId)
     {
-        $userId = (int) $this->request->jwtPayload->sub;
+        $userId = (int) $this->getAuthUserId();
         $result = $this->cartService->removeItem($userId, $itemId);
 
         return $this->handleServiceResult($result, 'Item removed from cart');
@@ -66,7 +66,7 @@ class CartController extends BaseApiController
 
     public function clear()
     {
-        $userId = (int) $this->request->jwtPayload->sub;
+        $userId = (int) $this->getAuthUserId();
         $this->cartService->clearCart($userId);
 
         return $this->respondSuccess('Cart cleared');

@@ -15,7 +15,7 @@ class UserController extends BaseApiController
 
     public function profile()
     {
-        $userId  = (int) $this->request->jwtPayload->sub;
+        $userId  = (int) $this->getAuthUserId();
         $profile = $this->userService->getProfile($userId);
 
         if (! $profile) {
@@ -36,7 +36,7 @@ class UserController extends BaseApiController
             return $this->respondValidationError($this->validator->getErrors());
         }
 
-        $userId = (int) $this->request->jwtPayload->sub;
+        $userId = (int) $this->getAuthUserId();
         $result = $this->userService->updateProfile($userId, $this->request->getJSON(true));
 
         if ($result === false) {
@@ -48,7 +48,7 @@ class UserController extends BaseApiController
 
     public function addresses()
     {
-        $userId    = (int) $this->request->jwtPayload->sub;
+        $userId    = (int) $this->getAuthUserId();
         $addresses = $this->userService->getAddresses($userId);
 
         return $this->respondSuccess('Addresses retrieved', $addresses);
@@ -73,7 +73,7 @@ class UserController extends BaseApiController
             return $this->respondValidationError($this->validator->getErrors());
         }
 
-        $userId = (int) $this->request->jwtPayload->sub;
+        $userId = (int) $this->getAuthUserId();
         $result = $this->userService->addAddress($userId, $this->request->getJSON(true));
 
         if (! $result) {
@@ -85,7 +85,7 @@ class UserController extends BaseApiController
 
     public function deleteAddress(int $addressId)
     {
-        $userId  = (int) $this->request->jwtPayload->sub;
+        $userId  = (int) $this->getAuthUserId();
         $deleted = $this->userService->deleteAddress($userId, $addressId);
 
         if (! $deleted) {

@@ -100,7 +100,7 @@ class UserController extends BaseApiController
         }
 
         // Prevent admins from deactivating themselves
-        if ((int) $id === (int) $this->request->jwtPayload->sub) {
+        if ((int) $id === $this->getAuthUserId()) {
             return $this->respondError('You cannot change your own status', [], 422);
         }
 
@@ -132,7 +132,7 @@ class UserController extends BaseApiController
             return $this->respondNotFound('User not found');
         }
 
-        if ((int) $id === (int) $this->request->jwtPayload->sub) {
+        if ((int) $id === $this->getAuthUserId()) {
             return $this->respondError('You cannot change your own role', [], 422);
         }
 

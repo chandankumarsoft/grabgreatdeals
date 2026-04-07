@@ -35,7 +35,7 @@
     <tr>
         <td style="padding:30px 30px 0 30px; text-align:center;">
             <p style="font-size:36px; margin:0;"><?= $cfg['icon'] ?></p>
-            <h2 style="margin:10px 0 6px; color:<?= $cfg['color'] ?>;">Order <?= ucfirst(esc($order['status'])) ?></h2>
+            <h2 style="margin:10px 0 6px; color:<?= $cfg['color'] ?>;">Order <?= ucfirst(esc((string) $order['status'])) ?></h2>
             <p style="margin:0; color:#555; font-size:15px;">Hi <?= esc($customer_name) ?>, here's an update on your order.</p>
         </td>
     </tr>

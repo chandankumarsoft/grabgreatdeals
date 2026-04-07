@@ -19,7 +19,7 @@ class PaymentController extends BaseApiController
      */
     public function show(int $orderId)
     {
-        $userId  = (int) $this->request->jwtPayload->sub;
+        $userId  = (int) $this->getAuthUserId();
         $payment = $this->paymentService->getPaymentForUser($orderId, $userId);
 
         if ($payment === false) {

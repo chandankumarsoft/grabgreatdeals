@@ -32,7 +32,7 @@ class CouponController extends BaseApiController
             return $this->respondValidationError($this->validator->getErrors());
         }
 
-        $userId = (int) $this->request->jwtPayload->sub;
+        $userId = (int) $this->getAuthUserId();
         $code   = $this->request->getJSON()->code ?? '';
 
         // Get cart total to validate minimum order

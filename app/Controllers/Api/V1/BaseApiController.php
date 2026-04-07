@@ -26,6 +26,8 @@ abstract class BaseApiController extends BaseController
             return null;
         }
 
-        return $this->request->jwtPayload->sub ?? null;
+        // jwtPayload is set dynamically by AuthFilter after JWT verification
+        // @phpstan-ignore-next-line
+        return isset($this->request->jwtPayload) ? (int) $this->request->jwtPayload->sub : null;
     }
 }
