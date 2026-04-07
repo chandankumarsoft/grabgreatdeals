@@ -33,7 +33,7 @@ class UserController extends BaseApiController
         ];
 
         if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $userId = (int) $this->getAuthUserId();
@@ -70,7 +70,7 @@ class UserController extends BaseApiController
         ];
 
         if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $userId = (int) $this->getAuthUserId();
@@ -80,7 +80,7 @@ class UserController extends BaseApiController
             return $this->respondError('Failed to add address');
         }
 
-        return $this->respondSuccess('Address added', $result, 201);
+        return $this->respondCreated('Address added', $result);
     }
 
     public function deleteAddress(int $addressId)

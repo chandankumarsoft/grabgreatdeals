@@ -40,7 +40,7 @@ class OrderController extends BaseApiController
         ];
 
         if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $status = $this->request->getJSON(true)['status'];

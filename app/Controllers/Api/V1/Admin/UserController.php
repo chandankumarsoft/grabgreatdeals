@@ -90,7 +90,7 @@ class UserController extends BaseApiController
         $rules = ['is_active' => 'required|in_list[0,1]'];
 
         if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $user = $this->userModel->find($id);
@@ -123,7 +123,7 @@ class UserController extends BaseApiController
         $rules = ['role' => 'required|in_list[customer,admin]'];
 
         if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $user = $this->userModel->find($id);

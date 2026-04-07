@@ -4,7 +4,7 @@ namespace App\Traits;
 
 trait ApiResponseTrait
 {
-    protected function respond(bool $status, string $message, $data = [], array $errors = [], int $statusCode = 200)
+    protected function respond(bool $status, string $message, $data = null, array $errors = [], int $statusCode = 200)
     {
         return $this->response
             ->setStatusCode($statusCode)
@@ -16,14 +16,39 @@ trait ApiResponseTrait
             ]);
     }
 
-    protected function respondSuccess(string $message, $data = [], int $statusCode = 200)
+    // ─── 2xx Success ────────────────────────────────────────────────────────
+
+    protected function respondSuccess(string $message, $data = null, int $statusCode = 200)
     {
         return $this->respond(true, $message, $data, [], $statusCode);
     }
 
+    protected function respondCreated(string $message, $data = null)
+    {
+        return $this->respond(true, $message, $data, [], 201);
+    }
+
+    protected function respondNoContent(string $message = 'No content')
+    {
+        return $this->respond(true, $message, null, [], 204);
+    }
+
+    // ─── 4xx / 5xx Errors ───────────────────────────────────────────────────
+
     protected function respondError(string $message, array $errors = [], int $statusCode = 400)
     {
-        return $this->respond(false, $message, [], $errors, $statusCode);
+        return $this->respond(false, $message, null, $errors, $statusCode);
+    }
+
+    protected function respondValidationErrors(array $errors)
+    {
+        return $this->respondError('Validation failed', $errors, 422);
+    }
+
+    /** @deprecated Use respondValidationErrors() */
+    protected function respondValidationError(array $errors)
+    {
+        return $this->respondValidationErrors($errors);
     }
 
     protected function respondUnauthorized(string $message = 'Unauthorized')
@@ -41,8 +66,8 @@ trait ApiResponseTrait
         return $this->respondError($message, [], 404);
     }
 
-    protected function respondValidationError(array $errors)
+    protected function respondServerError(string $message = 'Internal server error')
     {
-        return $this->respondError('Validation failed', $errors, 422);
+        return $this->respondError($message, [], 500);
     }
 }

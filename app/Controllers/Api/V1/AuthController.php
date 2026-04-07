@@ -23,7 +23,7 @@ class AuthController extends BaseApiController
         ];
 
         if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $result = $this->authService->register($this->request->getJSON(true));
@@ -32,7 +32,7 @@ class AuthController extends BaseApiController
             return $this->respondError('Registration failed', $this->authService->getValidationErrors(), 422);
         }
 
-        return $this->respondSuccess('Registration successful', $result, 201);
+        return $this->respondCreated('Registration successful', $result);
     }
 
     public function login()
@@ -43,7 +43,7 @@ class AuthController extends BaseApiController
         ];
 
         if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $body  = $this->request->getJSON(true);

@@ -25,7 +25,7 @@ class OrderController extends BaseApiController
         ];
 
         if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $userId = (int) $this->getAuthUserId();
@@ -57,7 +57,7 @@ class OrderController extends BaseApiController
             return $this->respondError('Stock validation failed', $result, 422);
         }
 
-        return $this->respondSuccess('Order placed successfully', $result, 201);
+        return $this->respondCreated('Order placed successfully', $result);
     }
 
     public function index()

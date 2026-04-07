@@ -49,7 +49,7 @@ class ProductController extends BaseApiController
         ];
 
         if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $result = $this->productService->create($this->request->getJSON(true));
@@ -58,7 +58,7 @@ class ProductController extends BaseApiController
             return $this->respondError('Failed to create product', $this->productService->getValidationErrors(), 422);
         }
 
-        return $this->respondSuccess('Product created', $result, 201);
+        return $this->respondCreated('Product created', $result);
     }
 
     public function update(int $id)
@@ -75,7 +75,7 @@ class ProductController extends BaseApiController
         ];
 
         if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $result = $this->productService->update($id, $this->request->getJSON(true));
@@ -120,7 +120,7 @@ class ProductController extends BaseApiController
             return $this->respondError('No valid images were uploaded. Allowed: jpeg, png, webp, gif');
         }
 
-        return $this->respondSuccess('Images uploaded', $result, 201);
+        return $this->respondCreated('Images uploaded', $result);
     }
 
     public function deleteImage(int $productId, int $imageId)

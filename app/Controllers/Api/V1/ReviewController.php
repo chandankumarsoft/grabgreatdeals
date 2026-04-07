@@ -41,7 +41,7 @@ class ReviewController extends BaseApiController
         ];
 
         if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $userId = (int) $this->getAuthUserId();
@@ -59,7 +59,7 @@ class ReviewController extends BaseApiController
             return $this->respondError('You have already submitted a review for this product.', [], 422);
         }
 
-        return $this->respondSuccess('Review submitted', $result, 201);
+        return $this->respondCreated('Review submitted', $result);
     }
 
     /**
@@ -75,7 +75,7 @@ class ReviewController extends BaseApiController
         ];
 
         if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $userId = (int) $this->getAuthUserId();

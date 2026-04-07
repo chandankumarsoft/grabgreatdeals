@@ -29,7 +29,7 @@ class CouponController extends BaseApiController
         $rules = ['code' => 'required|max_length[50]'];
 
         if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $userId = (int) $this->getAuthUserId();

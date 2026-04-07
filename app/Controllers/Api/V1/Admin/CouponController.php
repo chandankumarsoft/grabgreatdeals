@@ -59,7 +59,7 @@ class CouponController extends BaseApiController
         ];
 
         if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $data = $this->request->getJSON(true);
@@ -71,7 +71,7 @@ class CouponController extends BaseApiController
 
         $coupon = $this->couponService->create($data);
 
-        return $this->respondSuccess('Coupon created', $coupon, 201);
+        return $this->respondCreated('Coupon created', $coupon);
     }
 
     /**
@@ -94,7 +94,7 @@ class CouponController extends BaseApiController
         ];
 
         if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $data   = $this->request->getJSON(true);

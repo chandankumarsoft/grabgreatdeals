@@ -39,7 +39,7 @@ class ReviewController extends BaseApiController
         $rules = ['is_approved' => 'required|in_list[0,1]'];
 
         if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $isApproved = (int) $this->request->getJSON()->is_approved;
