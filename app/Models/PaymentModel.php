@@ -29,4 +29,13 @@ class PaymentModel extends Model
     {
         return $this->where('order_id', $orderId)->first();
     }
+
+    public function getByOrders(array $ids): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        return $this->whereIn('order_id', $ids)->findAll();
+    }
 }

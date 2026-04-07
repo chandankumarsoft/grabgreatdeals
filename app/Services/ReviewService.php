@@ -166,22 +166,14 @@ class ReviewService
 
     private function findDeliveredOrderWithProduct(int $userId, int $productId): ?int
     {
-        // Find all delivered orders for this user
-        $orders = $this->orderModel
-            ->where('user_id', $userId)
-            ->where('status', 'delivered')
-            ->findAll();
+        $row = $this->orderModel
+            ->select('orders.id')
+            ->join('order_items', 'order_items.order_id = orders.id')
+            ->where('orders.user_id', $userId)
+            ->where('orders.status', 'delivered')
+            ->where('order_items.product_id', $productId)
+            ->first();
 
-        foreach ($orders as $order) {
-            $items = $this->orderItemModel->getByOrder((int) $order['id']);
-
-            foreach ($items as $item) {
-                if ((int) $item['product_id'] === $productId) {
-                    return (int) $order['id'];
-                }
-            }
-        }
-
-        return null;
+        return $row ? (int) $row['id'] : null;
     }
 }

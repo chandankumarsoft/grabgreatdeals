@@ -43,24 +43,26 @@ class ProductService
             return null;
         }
 
-        $product['variants'] = $this->variantModel->getByProduct((int) $product['id']);
-        $product['images']   = $this->imageModel->getByProduct((int) $product['id']);
-        $product             = array_merge($product, $this->reviewModel->getRatingStats((int) $product['id']));
+        $product['variants']     = $this->variantModel->getByProduct((int) $product['id']);
+        $product['images']       = $this->imageModel->getByProduct((int) $product['id']);
+        $product['avg_rating']   = $product['avg_rating'] !== null ? (float) $product['avg_rating'] : null;
+        $product['review_count'] = (int) $product['review_count'];
 
         return $product;
     }
 
     public function getProductById(int $id): ?array
     {
-        $product = $this->productModel->find($id);
+        $product = $this->productModel->findByIdWithStats($id);
 
         if (! $product) {
             return null;
         }
 
-        $product['variants'] = $this->variantModel->getByProduct($id);
-        $product['images']   = $this->imageModel->getByProduct($id);
-        $product             = array_merge($product, $this->reviewModel->getRatingStats($id));
+        $product['variants']     = $this->variantModel->getByProduct($id);
+        $product['images']       = $this->imageModel->getByProduct($id);
+        $product['avg_rating']   = $product['avg_rating'] !== null ? (float) $product['avg_rating'] : null;
+        $product['review_count'] = (int) $product['review_count'];
 
         return $product;
     }

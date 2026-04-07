@@ -95,16 +95,15 @@ class CartService
     public function updateItem(int $userId, int $itemId, int $quantity): array|string
     {
         $cart = $this->cartModel->getOrCreateForUser($userId);
-        $item = $this->itemModel->getByCartAndId((int) $cart['id'], $itemId);
+        $item = $this->itemModel->getByCartAndIdFull((int) $cart['id'], $itemId);
 
         if (! $item) {
             return 'not_found';
         }
 
-        $product = $this->productModel->find($item['product_id']);
-        $stock   = $item['variant_id']
-            ? ($this->variantModel->find($item['variant_id'])['stock'] ?? 0)
-            : (int) $product['stock'];
+        $stock = $item['variant_id']
+            ? (int) ($item['variant_stock'] ?? 0)
+            : (int) ($item['product_stock'] ?? 0);
 
         if ($quantity > $stock) {
             return 'insufficient_stock';

@@ -25,7 +25,7 @@ class CartItemModel extends Model
 
     public function getByCart(int $cartId): array
     {
-        return $this->select('cart_items.*, products.name as product_name, products.thumbnail, products.stock as product_stock, product_variants.name as variant_name, product_variants.value as variant_value')
+        return $this->select('cart_items.*, products.name as product_name, products.thumbnail, products.stock as product_stock, product_variants.name as variant_name, product_variants.value as variant_value, product_variants.stock as variant_stock')
                     ->join('products', 'products.id = cart_items.product_id', 'left')
                     ->join('product_variants', 'product_variants.id = cart_items.variant_id', 'left')
                     ->where('cart_items.cart_id', $cartId)
@@ -49,6 +49,16 @@ class CartItemModel extends Model
     public function getByCartAndId(int $cartId, int $itemId): ?array
     {
         return $this->where('cart_id', $cartId)->where('id', $itemId)->first();
+    }
+
+    public function getByCartAndIdFull(int $cartId, int $itemId): ?array
+    {
+        return $this->select('cart_items.*, products.stock as product_stock, product_variants.stock as variant_stock')
+                    ->join('products', 'products.id = cart_items.product_id', 'left')
+                    ->join('product_variants', 'product_variants.id = cart_items.variant_id', 'left')
+                    ->where('cart_items.cart_id', $cartId)
+                    ->where('cart_items.id', $itemId)
+                    ->first();
     }
 
     public function clearCart(int $cartId): void

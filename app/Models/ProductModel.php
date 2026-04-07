@@ -32,10 +32,22 @@ class ProductModel extends Model
 
     public function findBySlug(string $slug): ?array
     {
-        return $this->select('products.*, categories.name as category_name, categories.slug as category_slug')
+        return $this->select('products.*, categories.name as category_name, categories.slug as category_slug,
+                (SELECT ROUND(AVG(rating), 1) FROM product_reviews WHERE product_id = products.id AND is_approved = 1) AS avg_rating,
+                (SELECT COUNT(*) FROM product_reviews WHERE product_id = products.id AND is_approved = 1) AS review_count')
                     ->join('categories', 'categories.id = products.category_id', 'left')
                     ->where('products.slug', $slug)
                     ->where('products.is_active', 1)
+                    ->first();
+    }
+
+    public function findByIdWithStats(int $id): ?array
+    {
+        return $this->select('products.*, categories.name as category_name,
+                (SELECT ROUND(AVG(rating), 1) FROM product_reviews WHERE product_id = products.id AND is_approved = 1) AS avg_rating,
+                (SELECT COUNT(*) FROM product_reviews WHERE product_id = products.id AND is_approved = 1) AS review_count')
+                    ->join('categories', 'categories.id = products.category_id', 'left')
+                    ->where('products.id', $id)
                     ->first();
     }
 

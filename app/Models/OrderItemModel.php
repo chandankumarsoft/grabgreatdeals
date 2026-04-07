@@ -29,4 +29,13 @@ class OrderItemModel extends Model
     {
         return $this->where('order_id', $orderId)->findAll();
     }
+
+    public function getByOrders(array $ids): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        return $this->whereIn('order_id', $ids)->orderBy('order_id', 'ASC')->findAll();
+    }
 }

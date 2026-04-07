@@ -158,9 +158,28 @@ class OrderService
     {
         $result = $this->orderModel->getByUser($userId, $perPage, $page);
 
-        foreach ($result['items'] as &$order) {
-            $order['items']   = $this->orderItemModel->getByOrder((int) $order['id']);
-            $order['payment'] = $this->paymentModel->getByOrder((int) $order['id']);
+        if (! empty($result['items'])) {
+            $ids = array_column($result['items'], 'id');
+
+            $allItems    = $this->orderItemModel->getByOrders($ids);
+            $allPayments = $this->paymentModel->getByOrders($ids);
+
+            $itemsByOrder = [];
+            foreach ($allItems as $item) {
+                $itemsByOrder[(int) $item['order_id']][] = $item;
+            }
+
+            $paymentByOrder = [];
+            foreach ($allPayments as $payment) {
+                $paymentByOrder[(int) $payment['order_id']] = $payment;
+            }
+
+            foreach ($result['items'] as &$order) {
+                $oid = (int) $order['id'];
+                $order['items']   = $itemsByOrder[$oid] ?? [];
+                $order['payment'] = $paymentByOrder[$oid] ?? null;
+            }
+            unset($order);
         }
 
         return $result;
@@ -221,12 +240,9 @@ class OrderService
         $errors = [];
 
         foreach ($items as $item) {
-            $stock = (int) $item['product_stock'];
-
-            if ($item['variant_id']) {
-                $variant = $this->variantModel->find($item['variant_id']);
-                $stock   = $variant ? (int) $variant['stock'] : 0;
-            }
+            $stock = $item['variant_id']
+                ? (int) ($item['variant_stock'] ?? 0)
+                : (int) $item['product_stock'];
 
             if ((int) $item['quantity'] > $stock) {
                 $errors[] = "Insufficient stock for: {$item['product_name']}";
