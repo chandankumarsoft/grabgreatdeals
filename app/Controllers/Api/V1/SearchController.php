@@ -2,21 +2,18 @@
 
 namespace App\Controllers\Api\V1;
 
-use App\Models\ProductModel;
-use App\Models\CategoryModel;
+use App\Services\ProductService;
 
 class SearchController extends BaseApiController
 {
-    protected ProductModel  $productModel;
-    protected CategoryModel $categoryModel;
+    protected ProductService $productService;
 
     public function __construct()
     {
-        $this->productModel  = new ProductModel();
-        $this->categoryModel = new CategoryModel();
+        $this->productService = new ProductService();
     }
 
-    // ─── GET /search ──────────────────────────────────────────────────────────
+    // â”€â”€â”€ GET /search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     //
     // Query params:
     //   q          (required, min 2 chars)
@@ -30,31 +27,20 @@ class SearchController extends BaseApiController
         $q = trim((string) ($this->request->getGet('q') ?? ''));
 
         if (strlen($q) < 2) {
-            return $this->respondValidationError(['q' => 'Search query must be at least 2 characters.']);
+            return $this->respondValidationErrors(['q' => 'Search query must be at least 2 characters.']);
         }
 
         $params = [
-            'limit'     => $this->request->getGet('limit')     ?? 20,
+            'limit'     => $this->request->getGet('limit')    ?? 20,
             'category'  => (string) ($this->request->getGet('category')  ?? ''),
             'min_price' => (string) ($this->request->getGet('min_price') ?? ''),
             'max_price' => (string) ($this->request->getGet('max_price') ?? ''),
         ];
 
-        $products   = $this->productModel->searchProducts($q, $params);
-        $categories = $this->categoryModel
-                           ->like('name', $q)
-                           ->where('is_active', 1)
-                           ->findAll(5);
-
-        return $this->respondSuccess('Search results retrieved.', [
-            'query'          => $q,
-            'total_products' => count($products),
-            'products'       => $products,
-            'categories'     => $categories,
-        ]);
+        return $this->respondSuccess('Search results retrieved.', $this->productService->search($q, $params));
     }
 
-    // ─── GET /search/suggestions ──────────────────────────────────────────────
+    // â”€â”€â”€ GET /search/suggestions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     //
     // Query params:
     //   q      (min 1 char)
@@ -72,11 +58,9 @@ class SearchController extends BaseApiController
             ]);
         }
 
-        $items = $this->productModel->getSuggestions($q, $limit);
-
         return $this->respondSuccess('Suggestions retrieved.', [
             'query'       => $q,
-            'suggestions' => $items,
+            'suggestions' => $this->productService->getSuggestions($q, $limit),
         ]);
     }
 }

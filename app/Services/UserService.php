@@ -7,6 +7,8 @@ use App\Models\UserAddressModel;
 
 class UserService
 {
+    private const USER_FIELDS = 'id, name, email, phone, role, is_active, created_at, updated_at';
+
     protected UserModel        $userModel;
     protected UserAddressModel $addressModel;
 
@@ -15,6 +17,69 @@ class UserService
         $this->userModel    = new UserModel();
         $this->addressModel = new UserAddressModel();
     }
+
+    // ─── Admin: User Management ─────────────────────────────────────────────
+
+    public function list(array $params = []): array
+    {
+        $page    = (int) ($params['page']     ?? 1);
+        $perPage = (int) ($params['per_page'] ?? 15);
+        $role    = (string) ($params['role']   ?? '');
+        $search  = (string) ($params['search'] ?? '');
+        $status  = $params['status'] ?? null;
+
+        $builder = $this->userModel->select(self::USER_FIELDS);
+
+        if ($role !== '') {
+            $builder->where('role', $role);
+        }
+
+        if ($search !== '') {
+            $builder->groupStart()
+                    ->like('name', $search)
+                    ->orLike('email', $search)
+                    ->groupEnd();
+        }
+
+        if ($status !== null && $status !== '') {
+            $builder->where('is_active', (int) $status);
+        }
+
+        $total = $builder->countAllResults(false);
+        $items = $builder->orderBy('created_at', 'DESC')
+                         ->findAll($perPage, ($page - 1) * $perPage);
+
+        return [
+            'items'    => $items,
+            'total'    => $total,
+            'page'     => $page,
+            'per_page' => $perPage,
+            'pages'    => $total > 0 ? (int) ceil($total / $perPage) : 0,
+        ];
+    }
+
+    public function getById(int $id): ?array
+    {
+        return $this->userModel
+            ->select(self::USER_FIELDS)
+            ->find($id);
+    }
+
+    public function updateStatus(int $id, int $isActive): ?array
+    {
+        $this->userModel->update($id, ['is_active' => $isActive]);
+
+        return $this->getById($id);
+    }
+
+    public function updateRole(int $id, string $role): ?array
+    {
+        $this->userModel->update($id, ['role' => $role]);
+
+        return $this->getById($id);
+    }
+
+    // ─── Customer: Profile & Addresses ─────────────────────────────────────
 
     public function getProfile(int $userId): ?array
     {

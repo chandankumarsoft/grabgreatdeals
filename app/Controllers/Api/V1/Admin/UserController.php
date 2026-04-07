@@ -3,15 +3,15 @@
 namespace App\Controllers\Api\V1\Admin;
 
 use App\Controllers\Api\V1\BaseApiController;
-use App\Models\UserModel;
+use App\Services\UserService;
 
 class UserController extends BaseApiController
 {
-    protected UserModel $userModel;
+    protected UserService $userService;
 
     public function __construct()
     {
-        $this->userModel = new UserModel();
+        $this->userService = new UserService();
     }
 
     /**
@@ -27,40 +27,15 @@ class UserController extends BaseApiController
      */
     public function index()
     {
-        $page    = max(1, (int) ($this->request->getGet('page')     ?? 1));
-        $perPage = min(100, max(1, (int) ($this->request->getGet('per_page') ?? 15)));
-        $role    = $this->request->getGet('role')   ?? '';
-        $search  = $this->request->getGet('search') ?? '';
-        $status  = $this->request->getGet('status');
+        $params = [
+            'page'     => max(1, (int) ($this->request->getGet('page')     ?? 1)),
+            'per_page' => min(100, max(1, (int) ($this->request->getGet('per_page') ?? 15))),
+            'role'     => $this->request->getGet('role')   ?? '',
+            'search'   => $this->request->getGet('search') ?? '',
+            'status'   => $this->request->getGet('status'),
+        ];
 
-        $builder = $this->userModel->select('id, name, email, phone, role, is_active, created_at, updated_at');
-
-        if ($role !== '') {
-            $builder->where('role', $role);
-        }
-
-        if ($search !== '') {
-            $builder->groupStart()
-                    ->like('name', $search)
-                    ->orLike('email', $search)
-                    ->groupEnd();
-        }
-
-        if ($status !== null && $status !== '') {
-            $builder->where('is_active', (int) $status);
-        }
-
-        $total = $builder->countAllResults(false);
-        $items = $builder->orderBy('created_at', 'DESC')
-                         ->findAll($perPage, ($page - 1) * $perPage);
-
-        return $this->respondSuccess('Users retrieved', [
-            'items'    => $items,
-            'total'    => $total,
-            'page'     => $page,
-            'per_page' => $perPage,
-            'pages'    => $total > 0 ? (int) ceil($total / $perPage) : 0,
-        ]);
+        return $this->respondSuccess('Users retrieved', $this->userService->list($params));
     }
 
     /**
@@ -69,9 +44,7 @@ class UserController extends BaseApiController
      */
     public function show(int $id)
     {
-        $user = $this->userModel
-            ->select('id, name, email, phone, role, is_active, created_at, updated_at')
-            ->find($id);
+        $user = $this->userService->getById($id);
 
         if (! $user) {
             return $this->respondNotFound('User not found');
@@ -93,22 +66,15 @@ class UserController extends BaseApiController
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 
-        $user = $this->userModel->find($id);
-
-        if (! $user) {
+        if (! $this->userService->getById($id)) {
             return $this->respondNotFound('User not found');
         }
 
-        // Prevent admins from deactivating themselves
         if ((int) $id === $this->getAuthUserId()) {
             return $this->respondError('You cannot change your own status', [], 422);
         }
 
-        $this->userModel->update($id, ['is_active' => (int) $this->request->getJSON()->is_active]);
-
-        $updated = $this->userModel
-            ->select('id, name, email, phone, role, is_active, created_at, updated_at')
-            ->find($id);
+        $updated = $this->userService->updateStatus($id, (int) $this->request->getJSON()->is_active);
 
         return $this->respondSuccess('User status updated', $updated);
     }
@@ -126,9 +92,7 @@ class UserController extends BaseApiController
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 
-        $user = $this->userModel->find($id);
-
-        if (! $user) {
+        if (! $this->userService->getById($id)) {
             return $this->respondNotFound('User not found');
         }
 
@@ -136,11 +100,7 @@ class UserController extends BaseApiController
             return $this->respondError('You cannot change your own role', [], 422);
         }
 
-        $this->userModel->update($id, ['role' => $this->request->getJSON()->role]);
-
-        $updated = $this->userModel
-            ->select('id, name, email, phone, role, is_active, created_at, updated_at')
-            ->find($id);
+        $updated = $this->userService->updateRole($id, $this->request->getJSON()->role);
 
         return $this->respondSuccess('User role updated', $updated);
     }

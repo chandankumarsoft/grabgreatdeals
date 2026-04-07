@@ -212,6 +212,27 @@ class ProductService
         return (bool) $this->imageModel->delete($imageId);
     }
 
+    public function search(string $q, array $params = []): array
+    {
+        $products   = $this->productModel->searchProducts($q, $params);
+        $categories = $this->categoryModel
+            ->like('name', $q)
+            ->where('is_active', 1)
+            ->findAll(5);
+
+        return [
+            'query'          => $q,
+            'total_products' => count($products),
+            'products'       => $products,
+            'categories'     => $categories,
+        ];
+    }
+
+    public function getSuggestions(string $q, int $limit = 8): array
+    {
+        return $this->productModel->getSuggestions($q, $limit);
+    }
+
     public function getValidationErrors(): array
     {
         return $this->productModel->errors();
