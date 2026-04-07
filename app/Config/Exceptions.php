@@ -3,7 +3,7 @@
 namespace Config;
 
 use CodeIgniter\Config\BaseConfig;
-use CodeIgniter\Debug\ExceptionHandler;
+use App\Libraries\ApiExceptionHandler;
 use CodeIgniter\Debug\ExceptionHandlerInterface;
 use Psr\Log\LogLevel;
 use Throwable;
@@ -33,7 +33,9 @@ class Exceptions extends BaseConfig
      *
      * @var list<int>
      */
-    public array $ignoreCodes = [404];
+    // 4xx client errors are expected operational responses — no logging needed.
+    // Only 5xx server errors should appear in the error logs.
+    public array $ignoreCodes = [400, 401, 403, 404, 405, 422];
 
     /**
      * --------------------------------------------------------------------------
@@ -101,6 +103,6 @@ class Exceptions extends BaseConfig
      */
     public function handler(int $statusCode, Throwable $exception): ExceptionHandlerInterface
     {
-        return new ExceptionHandler($this);
+        return new ApiExceptionHandler($this);
     }
 }

@@ -22,7 +22,7 @@ class AuthFilter implements FilterInterface
                 ->setJSON([
                     'status'  => false,
                     'message' => 'Missing or invalid Authorization header',
-                    'data'    => [],
+                    'data'    => null,
                     'errors'  => [],
                 ]);
         }
@@ -39,7 +39,7 @@ class AuthFilter implements FilterInterface
                 ->setJSON([
                     'status'  => false,
                     'message' => 'Invalid or expired token',
-                    'data'    => [],
+                    'data'    => null,
                     'errors'  => [],
                 ]);
         }
@@ -50,7 +50,7 @@ class AuthFilter implements FilterInterface
                 ->setJSON([
                     'status'  => false,
                     'message' => 'Forbidden. Insufficient permissions.',
-                    'data'    => [],
+                    'data'    => null,
                     'errors'  => [],
                 ]);
         }
