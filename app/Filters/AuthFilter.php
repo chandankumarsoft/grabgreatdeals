@@ -27,11 +27,17 @@ class AuthFilter implements FilterInterface
                 ]);
         }
 
-        $token = substr($authHeader, 7);
+        $token = trim(substr($authHeader, 7));
         $jwtConfig = config(JwtConfig::class);
 
         try {
             $payload = JWT::decode($token, new Key($jwtConfig->secretKey, 'HS256'));
+
+            // Verify issuer to reject tokens from foreign services.
+            if (($payload->iss ?? '') !== base_url()) {
+                throw new \UnexpectedValueException('Invalid token issuer');
+            }
+
             $request->jwtPayload = $payload;
         } catch (Throwable $e) {
             return service('response')

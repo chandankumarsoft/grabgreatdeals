@@ -23,11 +23,11 @@ class AuthService
         $this->userModel->setValidationRule('password', 'required|min_length[8]|max_length[72]');
 
         $userId = $this->userModel->insert([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => $data['password'],
-            'phone'    => $data['phone'] ?? null,
-            'role'     => 'customer',
+            'name'      => trim($data['name']),
+            'email'     => strtolower(trim($data['email'])),
+            'password'  => $data['password'],
+            'phone'     => isset($data['phone']) ? trim($data['phone']) : null,
+            'role'      => 'customer',
             'is_active' => 1,
         ]);
 
@@ -43,9 +43,9 @@ class AuthService
         ];
     }
 
-    public function login(string $email, string $password): array|false
+    public function login(string $email, string $password): array|false|string
     {
-        $user = $this->userModel->findByEmail($email);
+        $user = $this->userModel->findByEmail(strtolower(trim($email)));
 
         if (! $user || ! password_verify($password, $user['password'])) {
             return false;
@@ -73,6 +73,7 @@ class AuthService
         $payload = [
             'iss' => base_url(),
             'iat' => $now,
+            'nbf' => $now,
             'exp' => $now + $this->jwtConfig->expiration,
             'sub' => $user['id'],
             'email' => $user['email'],

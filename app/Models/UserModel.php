@@ -36,7 +36,11 @@ class UserModel extends Model
     protected function hashPassword(array $data): array
     {
         if (isset($data['data']['password'])) {
-            $data['data']['password'] = password_hash($data['data']['password'], PASSWORD_BCRYPT);
+            $data['data']['password'] = password_hash(
+                $data['data']['password'],
+                PASSWORD_BCRYPT,
+                ['cost' => 12]
+            );
         }
 
         return $data;

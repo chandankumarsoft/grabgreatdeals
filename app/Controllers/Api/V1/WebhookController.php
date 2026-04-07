@@ -35,6 +35,12 @@ class WebhookController extends BaseApiController
      */
     public function payment(string $gateway)
     {
+        $allowedGateways = ['fpx', 'card', 'ewallet', 'bank_transfer', 'cod'];
+
+        if (! in_array($gateway, $allowedGateways, true)) {
+            return $this->respondNotFound('Unknown payment gateway');
+        }
+
         $body = $this->request->getJSON(true);
 
         if (empty($body)) {

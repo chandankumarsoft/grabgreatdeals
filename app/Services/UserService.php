@@ -97,9 +97,9 @@ class UserService
     public function updateProfile(int $userId, array $data): array|false
     {
         $allowed = array_filter([
-            'name'  => $data['name']  ?? null,
-            'phone' => $data['phone'] ?? null,
-        ], fn($v) => $v !== null);
+            'name'  => isset($data['name'])  ? trim($data['name'])  : null,
+            'phone' => isset($data['phone']) ? trim($data['phone']) : null,
+        ], fn($v) => $v !== null && $v !== '');
 
         if (empty($allowed)) {
             return false;
