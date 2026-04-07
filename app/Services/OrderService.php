@@ -9,6 +9,7 @@ use App\Models\ProductModel;
 use App\Models\ProductVariantModel;
 use App\Models\CartItemModel;
 use App\Models\CartModel;
+use App\Services\CouponService;
 
 class OrderService
 {
@@ -19,6 +20,7 @@ class OrderService
     protected ProductVariantModel $variantModel;
     protected CartModel           $cartModel;
     protected CartItemModel       $cartItemModel;
+    protected CouponService       $couponService;
 
     public function __construct()
     {
@@ -29,6 +31,7 @@ class OrderService
         $this->variantModel   = new ProductVariantModel();
         $this->cartModel      = new CartModel();
         $this->cartItemModel  = new CartItemModel();
+        $this->couponService  = new CouponService();
     }
 
     public function checkout(int $userId, array $data): array|string
@@ -53,7 +56,22 @@ class OrderService
             $subtotal += (float) $item['unit_price'] * (int) $item['quantity'];
         }
 
-        $total = $subtotal + $shippingFee;
+        // Coupon validation
+        $discountAmount = 0.0;
+        $coupon         = null;
+
+        if (! empty($data['coupon_code'])) {
+            $couponResult = $this->couponService->validate($data['coupon_code'], $userId, $subtotal);
+
+            if (is_string($couponResult)) {
+                return $couponResult;
+            }
+
+            $coupon         = $couponResult;
+            $discountAmount = $this->couponService->calculateDiscount($coupon, $subtotal);
+        }
+
+        $total = max(0, $subtotal + $shippingFee - $discountAmount);
 
         $db = db_connect();
         $db->transStart();
@@ -66,7 +84,7 @@ class OrderService
             'status'           => 'pending',
             'subtotal'         => $subtotal,
             'shipping_fee'     => $shippingFee,
-            'discount_amount'  => 0.00,
+            'discount_amount'  => $discountAmount,
             'total'            => $total,
             'shipping_name'    => $data['shipping_name'],
             'shipping_phone'   => $data['shipping_phone'],
@@ -108,6 +126,10 @@ class OrderService
         ]);
 
         $this->cartItemModel->clearCart((int) $cart['id']);
+
+        if ($coupon !== null) {
+            $this->couponService->recordUsage((int) $coupon['id'], $userId, (int) $orderId, $discountAmount);
+        }
 
         $db->transComplete();
 

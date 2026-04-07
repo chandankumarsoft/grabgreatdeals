@@ -20,6 +20,7 @@ class OrderController extends BaseApiController
             'shipping_phone'   => 'required|max_length[20]',
             'shipping_address' => 'required|max_length[500]',
             'payment_method'   => 'permit_empty|in_list[cod,card,fpx,ewallet,bank_transfer]',
+            'coupon_code'      => 'permit_empty|max_length[50]',
             'notes'            => 'permit_empty|max_length[500]',
         ];
 
@@ -36,6 +37,20 @@ class OrderController extends BaseApiController
 
         if ($result === 'transaction_failed') {
             return $this->respondError('Order could not be placed. Please try again.', [], 500);
+        }
+
+        $couponErrors = [
+            'coupon_not_found'              => 'Coupon code not found.',
+            'coupon_inactive'               => 'This coupon is not active.',
+            'coupon_not_started'            => 'This coupon is not valid yet.',
+            'coupon_expired'                => 'This coupon has expired.',
+            'coupon_usage_limit_reached'    => 'This coupon has reached its usage limit.',
+            'coupon_per_user_limit_reached' => 'You have already used this coupon the maximum number of times.',
+            'coupon_min_order_not_met'      => 'Your cart total does not meet the minimum order amount for this coupon.',
+        ];
+
+        if (is_string($result) && isset($couponErrors[$result])) {
+            return $this->respondError($couponErrors[$result], [], 422);
         }
 
         if (is_array($result) && isset($result[0]) && is_string($result[0])) {

@@ -49,6 +49,9 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], function ($r
 
         // Payment (customer view)
         $routes->get('orders/(:num)/payment',  'PaymentController::show/$1');
+
+        // Coupon validation
+        $routes->post('coupons/apply',         'CouponController::apply');
     });
 
     // ── Admin routes (JWT + admin role) ──────────────────────────────────────
@@ -73,6 +76,16 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], function ($r
 
         // Users management
         $routes->get('users',                             'Admin\UserController::index');
+        $routes->get('users/(:num)',                      'Admin\UserController::show/$1');
+        $routes->put('users/(:num)/status',               'Admin\UserController::updateStatus/$1');
+        $routes->put('users/(:num)/role',                 'Admin\UserController::updateRole/$1');
+
+        // Coupons management
+        $routes->get('coupons',                           'Admin\CouponController::index');
+        $routes->get('coupons/(:num)',                    'Admin\CouponController::show/$1');
+        $routes->post('coupons',                          'Admin\CouponController::create');
+        $routes->put('coupons/(:num)',                    'Admin\CouponController::update/$1');
+        $routes->delete('coupons/(:num)',                 'Admin\CouponController::delete/$1');
     });
 
     // ── Webhook routes (public, no auth — secured by gateway signature) ───────
