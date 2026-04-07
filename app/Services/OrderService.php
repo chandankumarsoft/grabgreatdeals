@@ -9,7 +9,9 @@ use App\Models\ProductModel;
 use App\Models\ProductVariantModel;
 use App\Models\CartItemModel;
 use App\Models\CartModel;
+use App\Models\UserModel;
 use App\Services\CouponService;
+use App\Services\EmailService;
 
 class OrderService
 {
@@ -21,6 +23,8 @@ class OrderService
     protected CartModel           $cartModel;
     protected CartItemModel       $cartItemModel;
     protected CouponService       $couponService;
+    protected UserModel           $userModel;
+    protected EmailService        $emailService;
 
     public function __construct()
     {
@@ -32,6 +36,8 @@ class OrderService
         $this->cartModel      = new CartModel();
         $this->cartItemModel  = new CartItemModel();
         $this->couponService  = new CouponService();
+        $this->userModel      = new UserModel();
+        $this->emailService   = new EmailService();
     }
 
     public function checkout(int $userId, array $data): array|string
@@ -137,7 +143,15 @@ class OrderService
             return 'transaction_failed';
         }
 
-        return $this->getOrderById($userId, (int) $orderId);
+        $result = $this->getOrderById($userId, (int) $orderId);
+
+        // Send confirmation email — failure is logged, never breaks the order response
+        $user = $this->userModel->find($userId);
+        if ($user && $result) {
+            $this->emailService->sendOrderConfirmation($result, $user['email'], $user['name']);
+        }
+
+        return $result;
     }
 
     public function getUserOrders(int $userId, int $perPage = 15, int $page = 1): array
@@ -189,7 +203,17 @@ class OrderService
             $this->paymentModel->where('order_id', $orderId)->set(['status' => 'paid', 'paid_at' => date('Y-m-d H:i:s')])->update();
         }
 
-        return $this->getOrderById(0, $orderId, true);
+        $result = $this->getOrderById(0, $orderId, true);
+
+        // Notify customer of status change
+        if ($result) {
+            $user = $this->userModel->find($result['user_id']);
+            if ($user) {
+                $this->emailService->sendOrderStatusUpdate($result, $user['email'], $user['name']);
+            }
+        }
+
+        return $result;
     }
 
     private function validateStock(array $items): array
