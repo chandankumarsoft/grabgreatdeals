@@ -1,0 +1,128 @@
+<?php
+
+namespace App\Controllers\Api\V1\Admin;
+
+use App\Controllers\Api\V1\BaseApiController;
+use App\Services\ProductService;
+
+class ProductController extends BaseApiController
+{
+    protected ProductService $productService;
+
+    public function __construct()
+    {
+        $this->productService = new ProductService();
+    }
+
+    public function index()
+    {
+        $params = [
+            'page'     => $this->request->getGet('page'),
+            'per_page' => $this->request->getGet('per_page'),
+            'search'   => $this->request->getGet('search'),
+        ];
+
+        $result = $this->productService->getAdminProducts($params);
+
+        return $this->respondSuccess('Products retrieved', $result);
+    }
+
+    public function create()
+    {
+        $rules = [
+            'name'        => 'required|min_length[2]|max_length[200]',
+            'category_id' => 'permit_empty|integer',
+            'price'       => 'required|decimal|greater_than[0]',
+            'sale_price'  => 'permit_empty|decimal|greater_than[0]',
+            'stock'       => 'permit_empty|integer|greater_than_equal_to[0]',
+            'sku'         => 'permit_empty|max_length[100]|is_unique[products.sku]',
+            'is_active'   => 'permit_empty|in_list[0,1]',
+            'is_featured' => 'permit_empty|in_list[0,1]',
+        ];
+
+        if (! $this->validate($rules)) {
+            return $this->respondValidationError($this->validator->getErrors());
+        }
+
+        $result = $this->productService->create($this->request->getJSON(true));
+
+        if (! $result) {
+            return $this->respondError('Failed to create product', $this->productService->getValidationErrors(), 422);
+        }
+
+        return $this->respondSuccess('Product created', $result, 201);
+    }
+
+    public function update(int $id)
+    {
+        $rules = [
+            'name'        => 'permit_empty|min_length[2]|max_length[200]',
+            'category_id' => 'permit_empty|integer',
+            'price'       => 'permit_empty|decimal|greater_than[0]',
+            'sale_price'  => 'permit_empty|decimal|greater_than[0]',
+            'stock'       => 'permit_empty|integer|greater_than_equal_to[0]',
+            'sku'         => 'permit_empty|max_length[100]|is_unique[products.sku,id,' . $id . ']',
+            'is_active'   => 'permit_empty|in_list[0,1]',
+            'is_featured' => 'permit_empty|in_list[0,1]',
+        ];
+
+        if (! $this->validate($rules)) {
+            return $this->respondValidationError($this->validator->getErrors());
+        }
+
+        $result = $this->productService->update($id, $this->request->getJSON(true));
+
+        if ($result === false) {
+            return $this->respondNotFound('Product not found');
+        }
+
+        return $this->respondSuccess('Product updated', $result);
+    }
+
+    public function delete(int $id)
+    {
+        $deleted = $this->productService->delete($id);
+
+        if (! $deleted) {
+            return $this->respondNotFound('Product not found');
+        }
+
+        return $this->respondSuccess('Product deleted');
+    }
+
+    public function uploadImages(int $id)
+    {
+        $files = $this->request->getFileMultiple('images') ?? [];
+
+        if (empty($files)) {
+            $single = $this->request->getFile('images');
+            if ($single) {
+                $files = [$single];
+            }
+        }
+
+        if (empty($files)) {
+            return $this->respondError('No image files provided');
+        }
+
+        $isPrimary = (bool) $this->request->getPost('is_primary');
+        $result    = $this->productService->uploadImages($id, $files, $isPrimary);
+
+        if (empty($result)) {
+            return $this->respondError('No valid images were uploaded. Allowed: jpeg, png, webp, gif');
+        }
+
+        return $this->respondSuccess('Images uploaded', $result, 201);
+    }
+
+    public function deleteImage(int $productId, int $imageId)
+    {
+        $deleted = $this->productService->deleteImage($productId, $imageId);
+
+        if (! $deleted) {
+            return $this->respondNotFound('Image not found');
+        }
+
+        return $this->respondSuccess('Image deleted');
+    }
+}

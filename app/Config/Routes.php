@@ -51,15 +51,20 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], function ($r
     // ── Admin routes (JWT + admin role) ──────────────────────────────────────
     $routes->group('admin', ['filter' => 'auth:admin'], function ($routes) {
         // Products
-        $routes->post('products',              'Admin\ProductController::create');
-        $routes->put('products/(:num)',        'Admin\ProductController::update/$1');
-        $routes->delete('products/(:num)',     'Admin\ProductController::delete/$1');
+        $routes->get('products',                          'Admin\ProductController::index');
+        $routes->post('products',                         'Admin\ProductController::create');
+        $routes->put('products/(:num)',                   'Admin\ProductController::update/$1');
+        $routes->delete('products/(:num)',                'Admin\ProductController::delete/$1');
+
+        // Product images
+        $routes->post('products/(:num)/images',           'Admin\ProductController::uploadImages/$1');
+        $routes->delete('products/(:num)/images/(:num)',  'Admin\ProductController::deleteImage/$1/$2');
 
         // Orders management
-        $routes->get('orders',                 'Admin\OrderController::index');
-        $routes->put('orders/(:num)/status',   'Admin\OrderController::updateStatus/$1');
+        $routes->get('orders',                            'Admin\OrderController::index');
+        $routes->put('orders/(:num)/status',              'Admin\OrderController::updateStatus/$1');
 
         // Users management
-        $routes->get('users',                  'Admin\UserController::index');
+        $routes->get('users',                             'Admin\UserController::index');
     });
 });

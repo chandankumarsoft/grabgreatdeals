@@ -43,6 +43,17 @@ class AuthFilter implements FilterInterface
                     'errors'  => [],
                 ]);
         }
+
+        if (! empty($arguments) && ! in_array($payload->role, $arguments)) {
+            return service('response')
+                ->setStatusCode(403)
+                ->setJSON([
+                    'status'  => false,
+                    'message' => 'Forbidden. Insufficient permissions.',
+                    'data'    => [],
+                    'errors'  => [],
+                ]);
+        }
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null) {}
