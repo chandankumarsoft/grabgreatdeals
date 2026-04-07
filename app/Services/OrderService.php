@@ -5,8 +5,6 @@ namespace App\Services;
 use App\Models\OrderModel;
 use App\Models\OrderItemModel;
 use App\Models\PaymentModel;
-use App\Models\ProductModel;
-use App\Models\ProductVariantModel;
 use App\Models\CartItemModel;
 use App\Models\CartModel;
 use App\Models\UserModel;
@@ -18,8 +16,6 @@ class OrderService
     protected OrderModel          $orderModel;
     protected OrderItemModel      $orderItemModel;
     protected PaymentModel        $paymentModel;
-    protected ProductModel        $productModel;
-    protected ProductVariantModel $variantModel;
     protected CartModel           $cartModel;
     protected CartItemModel       $cartItemModel;
     protected CouponService       $couponService;
@@ -31,8 +27,6 @@ class OrderService
         $this->orderModel     = new OrderModel();
         $this->orderItemModel = new OrderItemModel();
         $this->paymentModel   = new PaymentModel();
-        $this->productModel   = new ProductModel();
-        $this->variantModel   = new ProductVariantModel();
         $this->cartModel      = new CartModel();
         $this->cartItemModel  = new CartItemModel();
         $this->couponService  = new CouponService();
@@ -98,29 +92,29 @@ class OrderService
             'notes'            => $data['notes'] ?? null,
         ]);
 
+        $orderItemsData = [];
+        $now            = date('Y-m-d H:i:s');
+
         foreach ($items as $item) {
-            $variantLabel = null;
+            $variantLabel = ($item['variant_name'] && $item['variant_value'])
+                ? $item['variant_name'] . ': ' . $item['variant_value']
+                : null;
 
-            if ($item['variant_name'] && $item['variant_value']) {
-                $variantLabel = $item['variant_name'] . ': ' . $item['variant_value'];
-            }
-
-            $lineSubtotal = (float) $item['unit_price'] * (int) $item['quantity'];
-
-            $this->orderItemModel->insert([
-                'order_id'     => $orderId,
-                'product_id'   => $item['product_id'],
-                'variant_id'   => $item['variant_id'],
-                'product_name' => $item['product_name'],
+            $orderItemsData[] = [
+                'order_id'      => $orderId,
+                'product_id'    => $item['product_id'],
+                'variant_id'    => $item['variant_id'],
+                'product_name'  => $item['product_name'],
                 'variant_label' => $variantLabel,
-                'quantity'     => $item['quantity'],
-                'unit_price'   => $item['unit_price'],
-                'subtotal'     => $lineSubtotal,
-                'created_at'   => date('Y-m-d H:i:s'),
-            ]);
-
-            $this->decrementStock($item);
+                'quantity'      => $item['quantity'],
+                'unit_price'    => $item['unit_price'],
+                'subtotal'      => (float) $item['unit_price'] * (int) $item['quantity'],
+                'created_at'    => $now,
+            ];
         }
+
+        $this->orderItemModel->insertBatch($orderItemsData);
+        $this->batchDecrementStock($items);
 
         $paymentMethod = $data['payment_method'] ?? 'cod';
 
@@ -252,19 +246,47 @@ class OrderService
         return $errors;
     }
 
-    private function decrementStock(array $item): void
+    private function batchDecrementStock(array $items): void
     {
-        if ($item['variant_id']) {
-            $variant = $this->variantModel->find($item['variant_id']);
+        $productUpdates = [];
+        $variantUpdates = [];
 
-            if ($variant) {
-                $newStock = max(0, (int) $variant['stock'] - (int) $item['quantity']);
-                $this->variantModel->update($item['variant_id'], ['stock' => $newStock]);
+        foreach ($items as $item) {
+            if ($item['variant_id']) {
+                $variantUpdates[(int) $item['variant_id']] = (int) $item['quantity'];
+            } else {
+                $productUpdates[(int) $item['product_id']] = (int) $item['quantity'];
             }
-        } else {
-            $product  = $this->productModel->find($item['product_id']);
-            $newStock = max(0, (int) $product['stock'] - (int) $item['quantity']);
-            $this->productModel->update($item['product_id'], ['stock' => $newStock]);
         }
+
+        if (! empty($productUpdates)) {
+            $this->batchUpdateStock('products', $productUpdates);
+        }
+
+        if (! empty($variantUpdates)) {
+            $this->batchUpdateStock('product_variants', $variantUpdates);
+        }
+    }
+
+    private function batchUpdateStock(string $table, array $updates): void
+    {
+        $caseParts = array_fill(0, count($updates), 'WHEN ? THEN ?');
+        $params    = [];
+
+        foreach ($updates as $id => $qty) {
+            $params[] = $id;
+            $params[] = $qty;
+        }
+
+        $inPh = implode(',', array_fill(0, count($updates), '?'));
+
+        foreach (array_keys($updates) as $id) {
+            $params[] = $id;
+        }
+
+        db_connect()->query(
+            'UPDATE ' . $table . ' SET stock = GREATEST(0, stock - CASE id ' . implode(' ', $caseParts) . ' ELSE 0 END) WHERE id IN (' . $inPh . ')',
+            $params
+        );
     }
 }

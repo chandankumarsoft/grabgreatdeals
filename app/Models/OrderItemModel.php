@@ -20,6 +20,7 @@ class OrderItemModel extends Model
         'quantity',
         'unit_price',
         'subtotal',
+        'created_at',
     ];
 
     protected $useTimestamps = false;

@@ -29,7 +29,14 @@ class DashboardService
      */
     public function getSummary(): array
     {
-        $today     = date('Y-m-d');
+        $cacheKey = 'ggd_dashboard_summary_' . date('YmdHi');
+        $cached   = cache()->get($cacheKey);
+
+        if ($cached !== null) {
+            return $cached;
+        }
+
+        $today      = date('Y-m-d');
         $monthStart = date('Y-m-01');
 
         // ── Orders ──────────────────────────────────────────────────────────────
@@ -120,6 +127,10 @@ class DashboardService
             'recent_orders'      => $recentOrders,
             'low_stock_products' => $lowStock,
         ];
+
+        cache()->save($cacheKey, $result, 120);
+
+        return $result;
     }
 
     // ─── Sales Report ──────────────────────────────────────────────────────────

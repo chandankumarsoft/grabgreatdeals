@@ -19,6 +19,8 @@ class ProductVariantModel extends Model
         'stock',
         'sku',
         'is_active',
+        'created_at',
+        'updated_at',
     ];
 
     protected $useTimestamps = true;

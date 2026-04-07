@@ -157,8 +157,8 @@ class ProductService
             mkdir($uploadPath, 0755, true);
         }
 
-        $inserted  = [];
-        $sortStart = count($this->imageModel->getByProduct($productId));
+        $insertedIds = [];
+        $sortStart   = count($this->imageModel->getByProduct($productId));
 
         foreach ($files as $index => $file) {
             if (! $file->isValid() || $file->hasMoved()) {
@@ -190,11 +190,15 @@ class ProductService
             ]);
 
             if ($imageId) {
-                $inserted[] = $this->imageModel->find($imageId);
+                $insertedIds[] = $imageId;
             }
         }
 
-        return $inserted;
+        if (empty($insertedIds)) {
+            return [];
+        }
+
+        return $this->imageModel->whereIn('id', $insertedIds)->findAll();
     }
 
     public function deleteImage(int $productId, int $imageId): bool
@@ -244,12 +248,15 @@ class ProductService
     {
         $this->variantModel->deleteByProduct($productId);
 
+        $rows = [];
+        $now  = date('Y-m-d H:i:s');
+
         foreach ($variants as $variant) {
             if (empty($variant['name']) || empty($variant['value'])) {
                 continue;
             }
 
-            $this->variantModel->insert([
+            $rows[] = [
                 'product_id'       => $productId,
                 'name'             => $variant['name'],
                 'value'            => $variant['value'],
@@ -257,7 +264,13 @@ class ProductService
                 'stock'            => $variant['stock']            ?? 0,
                 'sku'              => $variant['sku']              ?? null,
                 'is_active'        => 1,
-            ]);
+                'created_at'       => $now,
+                'updated_at'       => $now,
+            ];
+        }
+
+        if (! empty($rows)) {
+            $this->variantModel->insertBatch($rows);
         }
     }
 
