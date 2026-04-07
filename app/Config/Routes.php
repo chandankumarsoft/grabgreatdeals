@@ -103,6 +103,12 @@ $routes->group('api/v1', ['namespace' => 'App\Controllers\Api\V1'], function ($r
         $routes->get('reviews',                        'Admin\ReviewController::index');
         $routes->put('reviews/(:num)/approve',         'Admin\ReviewController::approve/$1');
         $routes->delete('reviews/(:num)',              'Admin\ReviewController::delete/$1');
+
+        // Dashboard & Reports
+        $routes->get('dashboard',                      'Admin\DashboardController::index');
+        $routes->get('reports/sales',                  'Admin\DashboardController::salesReport');
+        $routes->get('reports/top-products',           'Admin\DashboardController::topProducts');
+        $routes->get('reports/orders-by-status',       'Admin\DashboardController::ordersByStatus');
     });
 
     // ── Webhook routes (public, no auth — secured by gateway signature) ───────
