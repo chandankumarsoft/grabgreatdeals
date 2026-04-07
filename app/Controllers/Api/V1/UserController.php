@@ -27,12 +27,7 @@ class UserController extends BaseApiController
 
     public function updateProfile()
     {
-        $rules = [
-            'name'  => 'permit_empty|min_length[2]|max_length[100]',
-            'phone' => 'permit_empty|max_length[20]',
-        ];
-
-        if (! $this->validate($rules)) {
+        if (! $this->validate('user_update_profile')) {
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 
@@ -56,20 +51,7 @@ class UserController extends BaseApiController
 
     public function addAddress()
     {
-        $rules = [
-            'label'          => 'permit_empty|max_length[50]',
-            'recipient_name' => 'required|max_length[100]',
-            'phone'          => 'required|max_length[20]',
-            'address_line1'  => 'required|max_length[255]',
-            'address_line2'  => 'permit_empty|max_length[255]',
-            'city'           => 'required|max_length[100]',
-            'state'          => 'required|max_length[100]',
-            'postal_code'    => 'required|max_length[20]',
-            'country'        => 'permit_empty|max_length[100]',
-            'is_default'     => 'permit_empty|in_list[0,1]',
-        ];
-
-        if (! $this->validate($rules)) {
+        if (! $this->validate('user_add_address')) {
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 

@@ -37,14 +37,8 @@ class PaymentController extends BaseApiController
      */
     public function update(int $orderId)
     {
-        $rules = [
-            'status'           => 'required|in_list[paid,failed,refunded]',
-            'transaction_id'   => 'permit_empty|max_length[255]',
-            'gateway_response' => 'permit_empty|max_length[2000]',
-        ];
-
-        if (! $this->validate($rules)) {
-            return $this->respondValidationError($this->validator->getErrors());
+        if (! $this->validate('admin_payment_update')) {
+            return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $result = $this->paymentService->adminUpdatePayment($orderId, $this->request->getJSON(true));

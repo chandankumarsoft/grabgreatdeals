@@ -44,29 +44,15 @@ class CouponController extends BaseApiController
      */
     public function create()
     {
-        $rules = [
-            'code'                 => 'required|max_length[50]',
-            'type'                 => 'required|in_list[percent,fixed]',
-            'value'                => 'required|decimal|greater_than[0]',
-            'description'          => 'permit_empty|max_length[255]',
-            'min_order_amount'     => 'permit_empty|decimal|greater_than_equal_to[0]',
-            'max_discount_amount'  => 'permit_empty|decimal|greater_than[0]',
-            'usage_limit'          => 'permit_empty|integer|greater_than[0]',
-            'usage_limit_per_user' => 'permit_empty|integer|greater_than[0]',
-            'is_active'            => 'permit_empty|in_list[0,1]',
-            'starts_at'            => 'permit_empty|valid_date[Y-m-d H:i:s]',
-            'expires_at'           => 'permit_empty|valid_date[Y-m-d H:i:s]',
-        ];
-
-        if (! $this->validate($rules)) {
+        if (! $this->validate('admin_coupon_create')) {
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 
         $data = $this->request->getJSON(true);
 
-        // percent value must be 1–100
+        // percent value must be 1–100–100
         if ($data['type'] === 'percent' && (float) $data['value'] > 100) {
-            return $this->respondValidationError(['value' => 'Percent discount cannot exceed 100.']);
+            return $this->respondValidationErrors(['value' => 'Percent discount cannot exceed 100.']);
         }
 
         $coupon = $this->couponService->create($data);
@@ -79,21 +65,7 @@ class CouponController extends BaseApiController
      */
     public function update(int $id)
     {
-        $rules = [
-            'code'                 => 'permit_empty|max_length[50]',
-            'type'                 => 'permit_empty|in_list[percent,fixed]',
-            'value'                => 'permit_empty|decimal|greater_than[0]',
-            'description'          => 'permit_empty|max_length[255]',
-            'min_order_amount'     => 'permit_empty|decimal|greater_than_equal_to[0]',
-            'max_discount_amount'  => 'permit_empty|decimal|greater_than[0]',
-            'usage_limit'          => 'permit_empty|integer|greater_than[0]',
-            'usage_limit_per_user' => 'permit_empty|integer|greater_than[0]',
-            'is_active'            => 'permit_empty|in_list[0,1]',
-            'starts_at'            => 'permit_empty|valid_date[Y-m-d H:i:s]',
-            'expires_at'           => 'permit_empty|valid_date[Y-m-d H:i:s]',
-        ];
-
-        if (! $this->validate($rules)) {
+        if (! $this->validate('admin_coupon_update')) {
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 

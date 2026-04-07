@@ -15,16 +15,7 @@ class OrderController extends BaseApiController
 
     public function checkout()
     {
-        $rules = [
-            'shipping_name'    => 'required|max_length[100]',
-            'shipping_phone'   => 'required|max_length[20]',
-            'shipping_address' => 'required|max_length[500]',
-            'payment_method'   => 'permit_empty|in_list[cod,card,fpx,ewallet,bank_transfer]',
-            'coupon_code'      => 'permit_empty|max_length[50]',
-            'notes'            => 'permit_empty|max_length[500]',
-        ];
-
-        if (! $this->validate($rules)) {
+        if (! $this->validate('order_checkout')) {
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 

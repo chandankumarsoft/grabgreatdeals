@@ -37,18 +37,7 @@ class ProductController extends BaseApiController
 
     public function create()
     {
-        $rules = [
-            'name'        => 'required|min_length[2]|max_length[200]',
-            'category_id' => 'permit_empty|integer',
-            'price'       => 'required|decimal|greater_than[0]',
-            'sale_price'  => 'permit_empty|decimal|greater_than[0]',
-            'stock'       => 'permit_empty|integer|greater_than_equal_to[0]',
-            'sku'         => 'permit_empty|max_length[100]|is_unique[products.sku]',
-            'is_active'   => 'permit_empty|in_list[0,1]',
-            'is_featured' => 'permit_empty|in_list[0,1]',
-        ];
-
-        if (! $this->validate($rules)) {
+        if (! $this->validate('admin_product_create')) {
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 
@@ -63,16 +52,8 @@ class ProductController extends BaseApiController
 
     public function update(int $id)
     {
-        $rules = [
-            'name'        => 'permit_empty|min_length[2]|max_length[200]',
-            'category_id' => 'permit_empty|integer',
-            'price'       => 'permit_empty|decimal|greater_than[0]',
-            'sale_price'  => 'permit_empty|decimal|greater_than[0]',
-            'stock'       => 'permit_empty|integer|greater_than_equal_to[0]',
-            'sku'         => 'permit_empty|max_length[100]|is_unique[products.sku,id,' . $id . ']',
-            'is_active'   => 'permit_empty|in_list[0,1]',
-            'is_featured' => 'permit_empty|in_list[0,1]',
-        ];
+        $rules = config('Validation')->admin_product_update;
+        $rules['sku'] = "permit_empty|max_length[100]|is_unique[products.sku,id,{$id}]";
 
         if (! $this->validate($rules)) {
             return $this->respondValidationErrors($this->validator->getErrors());

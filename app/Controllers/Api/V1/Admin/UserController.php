@@ -60,9 +60,7 @@ class UserController extends BaseApiController
      */
     public function updateStatus(int $id)
     {
-        $rules = ['is_active' => 'required|in_list[0,1]'];
-
-        if (! $this->validate($rules)) {
+        if (! $this->validate('admin_user_update_status')) {
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 
@@ -86,9 +84,7 @@ class UserController extends BaseApiController
      */
     public function updateRole(int $id)
     {
-        $rules = ['role' => 'required|in_list[customer,admin]'];
-
-        if (! $this->validate($rules)) {
+        if (! $this->validate('admin_user_update_role')) {
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 

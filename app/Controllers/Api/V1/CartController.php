@@ -23,13 +23,7 @@ class CartController extends BaseApiController
 
     public function add()
     {
-        $rules = [
-            'product_id' => 'required|integer|greater_than[0]',
-            'variant_id' => 'permit_empty|integer|greater_than[0]',
-            'quantity'   => 'permit_empty|integer|greater_than[0]',
-        ];
-
-        if (! $this->validate($rules)) {
+        if (! $this->validate('cart_add_item')) {
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 
@@ -41,11 +35,7 @@ class CartController extends BaseApiController
 
     public function update(int $itemId)
     {
-        $rules = [
-            'quantity' => 'required|integer|greater_than[0]',
-        ];
-
-        if (! $this->validate($rules)) {
+        if (! $this->validate('cart_update_item')) {
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 

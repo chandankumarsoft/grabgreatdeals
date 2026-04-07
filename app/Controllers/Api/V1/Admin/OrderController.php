@@ -35,11 +35,7 @@ class OrderController extends BaseApiController
 
     public function updateStatus(int $orderId)
     {
-        $rules = [
-            'status' => 'required|in_list[pending,confirmed,processing,shipped,delivered,cancelled,refunded]',
-        ];
-
-        if (! $this->validate($rules)) {
+        if (! $this->validate('admin_order_update_status')) {
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 

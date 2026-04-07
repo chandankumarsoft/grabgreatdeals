@@ -26,9 +26,7 @@ class CouponController extends BaseApiController
      */
     public function apply()
     {
-        $rules = ['code' => 'required|max_length[50]'];
-
-        if (! $this->validate($rules)) {
+        if (! $this->validate('coupon_apply')) {
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 

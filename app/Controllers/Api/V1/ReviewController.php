@@ -34,13 +34,7 @@ class ReviewController extends BaseApiController
      */
     public function create(int $productId)
     {
-        $rules = [
-            'rating' => 'required|integer|greater_than[0]|less_than[6]',
-            'title'  => 'permit_empty|max_length[150]',
-            'body'   => 'permit_empty|max_length[2000]',
-        ];
-
-        if (! $this->validate($rules)) {
+        if (! $this->validate('review_create')) {
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 
@@ -68,13 +62,7 @@ class ReviewController extends BaseApiController
      */
     public function update(int $productId, int $reviewId)
     {
-        $rules = [
-            'rating' => 'permit_empty|integer|greater_than[0]|less_than[6]',
-            'title'  => 'permit_empty|max_length[150]',
-            'body'   => 'permit_empty|max_length[2000]',
-        ];
-
-        if (! $this->validate($rules)) {
+        if (! $this->validate('review_update')) {
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 

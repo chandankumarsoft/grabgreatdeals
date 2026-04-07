@@ -15,14 +15,7 @@ class AuthController extends BaseApiController
 
     public function register()
     {
-        $rules = [
-            'name'     => 'required|min_length[2]|max_length[100]',
-            'email'    => 'required|valid_email|max_length[150]|is_unique[users.email]',
-            'password' => 'required|min_length[8]|max_length[72]',
-            'phone'    => 'permit_empty|max_length[20]',
-        ];
-
-        if (! $this->validate($rules)) {
+        if (! $this->validate('auth_register')) {
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 
@@ -37,12 +30,7 @@ class AuthController extends BaseApiController
 
     public function login()
     {
-        $rules = [
-            'email'    => 'required|valid_email',
-            'password' => 'required',
-        ];
-
-        if (! $this->validate($rules)) {
+        if (! $this->validate('auth_login')) {
             return $this->respondValidationErrors($this->validator->getErrors());
         }
 
